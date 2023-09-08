@@ -134,13 +134,14 @@ class process_attachments:
     def detect_file_type(self, file_path):
         self.file_type = None
         self.path = file_path
-        #print("File Path: ", self.path, Path(self.path).suffix)
         if Path(self.path).suffix in ['.csv', '.xls', '.xlsb', '.xlsm', '.xlsx', '.xml', '.ods']:
             self.file_type = "Tabular Data"
         elif Path(self.path).suffix in ['.jpeg', '.jpg', '.png', 'pdf', '.tif', '.tiff']:
             self.file_type = "Image Data"  
         elif Path(self.path).suffix in ['.txt', '.doc', '.docx', '.odt', '.rtf', '.wpd']:
             self.file_type = "Text Data"
+        else:
+            self.file_type = "Junk"
         return self.file_type
 
     def group_similar_file_types(self, list_paths):
@@ -154,8 +155,8 @@ class process_attachments:
                 self.list_image_types.append(path)
             elif self.file_type == "Text Data":
                 self.list_text_types.append(path)
-            #else:
-                #return None, None, None
+            else:
+               pass # Do nothing with that document
         return self.list_table_types, self.list_image_types, self.list_text_types
     
 
@@ -165,7 +166,7 @@ class plagiarism_calculation:
     
     def __init__(self):
         pass
-    
+
     '''
     def __init__(self, ocr_texts, doc_texts, table_texts):
         self.ocr_texts_list = ocr_texts
@@ -191,14 +192,18 @@ class plagiarism_calculation:
     
     def similarity_score_all_types(self, ocr_texts, doc_texts, table_texts):
         
+        
         self.ocr_texts_list = ocr_texts
         self.doc_texts_list = doc_texts
         self.table_texts_list = table_texts
         
-        if (len(self.ocr_texts_list) !=0) or (len(self.list_doc_texts_list) !=0):
+        if (len(self.ocr_texts_list) !=0) or (len(self.doc_texts_list) !=0):
             self.ocr_texts_list.extend(self.doc_texts_list)
             self.score_matrix = self.similarity_score(self.ocr_texts_list)
-            
+        
+        else:
+            self.score_matrix = {"primary_output":{"Attach_None":["NA"]}, "secondary_output": {"Attach_None": "NA"}}
+
         #self.score_matrix = self.similarity_score(self.ocr_text_list)
 
         '''

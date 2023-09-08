@@ -18,37 +18,53 @@ def main_plagiarism_check():
         req_json = request.json
         attachments_len = len(req_json)
         
-        list_paths = [] # we can set a condition here that if attachments are not more than one then plagiarism checking module will not work unless
+        print("LET US CHECK THE LENGTH: ", attachments_len)
+        output = {"primary_output":{"Attach_None":["NA"]}, "secondary_output": {"Attach_None": "NA"}} # Placeholder!
+
+        if attachments_len <= 1:
+            return jsonify(output)
+
+        else:
+            print("Here we are !!!")
+
+            list_paths = [] # we can set a condition here that if attachments are not more than one then plagiarism checking module will not work unless
                         # that one attachment has multiple medical records within. For document, medical record identifier and counter is needed.
     
-        for ii in range(1, attachments_len+1): 
-            list_paths.append(req_json[str(ii)])
+            for ii in range(1, attachments_len+1): 
+                list_paths.append(req_json[str(ii)])
 
-        process_obj = process_attachments()
-        list_types = process_obj.group_similar_file_types(list_paths)
+            process_obj = process_attachments()
+            list_types = process_obj.group_similar_file_types(list_paths)
     
-        list_ocr_texts, list_doc_texts, list_table_texts = [], [], []
+            list_ocr_texts, list_doc_texts, list_table_texts = [], [], []
 
-        if len(list_types[0]) != 0:
-            extract_text_table = extract_text_from_table()
-            list_table_texts = extract_text_table.extract_text(list_types[0])
-            list_table_texts = extract_text_table.process_all_text(list_table_texts)
+            #if len(list_types[0]) != 0:
+                #extract_text_table = extract_text_from_table()
+                #list_table_texts = extract_text_table.extract_text(list_types[0])
+                #list_table_texts = extract_text_table.process_all_text(list_table_texts)
     
-        if len(list_types[1]) != 0:
-            extract_text_image = extract_text_from_image()
-            list_ocr_texts = extract_text_image.extract_text(list_types[1])
-            list_ocr_texts = extract_text_image.process_all_text(list_ocr_texts)
+            if len(list_types[1]) != 0:
+                extract_text_image = extract_text_from_image()
+                list_ocr_texts = extract_text_image.extract_text(list_types[1])
+                list_ocr_texts = extract_text_image.process_all_text(list_ocr_texts)
 
-        if len(list_types[2]) != 0:
-            extract_text_doc = extract_text_from_doc()
-            list_doc_texts = extract_text_doc.extract_text(list_types[2])
-            list_doc_texts = extract_text_doc.process_all_text(list_doc_texts)
+            if len(list_types[2]) != 0:
+                extract_text_doc = extract_text_from_doc()
+                list_doc_texts = extract_text_doc.extract_text(list_types[2])
+                list_doc_texts = extract_text_doc.process_all_text(list_doc_texts)
 
-        plag_calc = plagiarism_calculation()
-        output = plag_calc.similarity_score_all_types(list_ocr_texts, list_doc_texts, list_table_texts)
-        output = plag_calc.filter_top_sim_score(output)
+            plag_calc = plagiarism_calculation()
+            
+            output = plag_calc.similarity_score_all_types(list_ocr_texts, list_doc_texts, list_table_texts)
+            
+            if len(list_types[1] + list_types[2]) > 0:
+                output = plag_calc.filter_top_sim_score(output)
+            else:
+                return jsonify(output)
 
-        return jsonify(output)
+            print(type(output), type(output['primary_output']), type(output['secondary_output']))
+
+            return jsonify(output)
 
 
 if __name__ == '__main__':
