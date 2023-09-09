@@ -3,6 +3,7 @@
 
 import os
 import numpy as np
+import pandas as pd
 from pathlib import Path
 import pytesseract
 from PIL import Image
@@ -16,6 +17,7 @@ import nltk
 from nltk.tokenize import word_tokenize,sent_tokenize
 from docx import Document
 from abc import abstractmethod
+
 ############################################# Classes on text extraction and text processing #############################################
 
 class extract_text_and_process:
@@ -132,6 +134,7 @@ class process_attachments:
         pass
 
     def detect_file_type(self, file_path):
+
         self.file_type = None
         self.path = file_path
         if Path(self.path).suffix in ['.csv', '.xls', '.xlsb', '.xlsm', '.xlsx', '.xml', '.ods']:
@@ -145,19 +148,27 @@ class process_attachments:
         return self.file_type
 
     def group_similar_file_types(self, list_paths):
+
         self.list_table_types, self.list_image_types, self.list_text_types = [], [], []
+        self.index_table_types, self.index_image_types, self.index_text_types = [], [], [] 
         self.list_path = list_paths
-        for path in list_paths:
+        
+        #for path in list_paths:
+        for i in range(len(list_paths)):
+            path = list_paths[i]
             self.file_type = self.detect_file_type(path)
             if self.file_type == "Tabular Data":
                 self.list_table_types.append(path)
+                self.index_table_types.append(str(i+1))
             elif self.file_type == "Image Data":
                 self.list_image_types.append(path)
+                self.index_image_types.append(str(i+1))
             elif self.file_type == "Text Data":
                 self.list_text_types.append(path)
+                self.index_text_types.append(str(i+1))
             else:
-               pass # Do nothing with that document
-        return self.list_table_types, self.list_image_types, self.list_text_types
+               pass # Do nothing with that document :: throw it !
+        return (self.list_table_types, self.list_image_types, self.list_text_types), (self.index_table_types, self.index_image_types, self.index_text_types)
     
 
 ############################################# Plagiarism calculation #############################################
@@ -174,35 +185,42 @@ class plagiarism_calculation:
         self.table_texts_list = table_texts
     '''
 
-    def similarity_score(self, list_w):
+    def similarity_score(self, list_w, index_types):
+
         self.list_w = list_w
-        self.count = len(self.list_w)
+        self.index_types = index_types
         self.scores = {}
-        
+        self.count = len(self.list_w)
         for i in range(self.count):
-            key = 'Attach_'+str(i+1)
-            self.scores[key] = []
+            #key = 'Attach_'+str(i+1)
+            key = 'Attach_'+self.index_types[i]
+            self.scores[key] = [] # placeholder!
             for j in range(self.count):
                 cosine_coef = textdistance.cosine(list_w[i], list_w[j])
-                perc_dist = round((math.pi - math.acos(cosine_coef)) * 100 / math.pi, 2)
+                perc_dist = round(cosine_coef*100.0, 2)
+                #perc_dist = round((math.pi - math.acos(cosine_coef)) * 100 / math.pi, 2)
+                #print(type(cosine_coef), type(perc_dist))
                 self.scores[key].append(perc_dist)
     
         return self.scores
 
     
-    def similarity_score_all_types(self, ocr_texts, doc_texts, table_texts):
-        
-        
+    def similarity_score_all_types(self, ocr_texts, doc_texts, table_texts, index_types):
+    
         self.ocr_texts_list = ocr_texts
         self.doc_texts_list = doc_texts
         self.table_texts_list = table_texts
-        
-        if (len(self.ocr_texts_list) !=0) or (len(self.doc_texts_list) !=0):
+        #self.index_types = index_types
+        if ((len(self.ocr_texts_list) !=0) or (len(self.doc_texts_list) !=0)) and (len(self.ocr_texts_list)+len(self.doc_texts_list) >= 2):
             self.ocr_texts_list.extend(self.doc_texts_list)
-            self.score_matrix = self.similarity_score(self.ocr_texts_list)
+            self.index_types = list(index_types[1])
+            self.index_types.extend(list(index_types[2]))
+            #print(len(self.ocr_texts_list), len(self.index_types))
+            #print(self.index_types)
+            self.score_matrix = self.similarity_score(self.ocr_texts_list, self.index_types)
         
         else:
-            self.score_matrix = {"primary_output":{"Attach_None":["NA"]}, "secondary_output": {"Attach_None": "NA"}}
+            self.score_matrix = {"Attach_None": "NA"}
 
         #self.score_matrix = self.similarity_score(self.ocr_text_list)
 
@@ -230,15 +248,55 @@ class plagiarism_calculation:
             temp_arr = np.array(score_matrix[key])
             highest = np.partition(temp_arr.flatten(), -2)[-2]
             index = np.where(temp_arr == highest)[0][0]
-
             temp_list = [key, self.doc_names[index], highest]
             self.primary_output.append(temp_list)
 
         self.final_output = {}
-
         self.final_output['primary_output'] = self.primary_output
         self.final_output['secondary_output'] = score_matrix
 
         return self.final_output
+
+
+    def filter_matrix(self, score_matrix):
+        
+        df = pd.DataFrame(columns=list(score_matrix.keys()))
+
+        for key in score_matrix:
+            df[key] = score_matrix[key]       
+        df = df.T
+        df.columns = list(score_matrix.keys())
+        #print(df)
+        df = df.where(np.triu(np.ones(df.shape)).astype(bool))
+        #print(df)
+        df = df.stack().reset_index()
+        df.columns = ['doc_1', 'doc_2', 'perc_sim']
+        #print(df)
+        if len(df[df['doc_1'] == df['doc_2']]) < len(df):
+            #df = df.drop_duplicates(subset=['Column2'], keep=False)
+            df.drop(df[df['doc_1'] == df['doc_2']].index, inplace = True)
+            df = df.sort_values(by='perc_sim', ascending=False)
+            df.reset_index(drop=True, inplace=True)
+        df = df.head(5)
+        #print("***************************************")
+        #print(df)
+        self.primary_output = df.values.tolist()
+        #print("---------------------------------------")
+        #print(df)
+        self.final_output = {}
+        self.final_output['primary_output'] = self.primary_output
+        self.final_output['secondary_output'] = score_matrix
+
+        return self.final_output
+
+        
+
+        
+
+
+
+
+
+
 
 
