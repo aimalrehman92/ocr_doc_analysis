@@ -14,9 +14,12 @@ import math
 import unicodedata
 import textdistance
 import nltk
+#from nltk.corpus import stopwords
+#from nltk.corpus import stopwords.words('english') as stopwords
 from nltk.tokenize import word_tokenize,sent_tokenize
 from docx import Document
 from abc import abstractmethod
+from pdf2image import convert_from_path
 
 ############################################# Classes on text extraction and text processing #############################################
 
@@ -42,9 +45,12 @@ class extract_text_and_process:
         #w = re.sub(r"([0-9])", r" ",w)       # Remove Numerical data
         self.w = re.sub("(.)\\1{2,}", "\\1", self.w)   # Remove duplicate characters
         self.words = self.w.split()                  # Tokenization
-        #clean_words = [word for word in words if (word not in stopwords_list) and len(word) > 2]
-        self.clean_words = [word for word in self.words if len(word) > 2]
-        return " ".join(self.clean_words)
+        #self.stopwords = nltk.corpus.stopwords.words('english')
+        #self.stopwords = stopwords.words('english')
+        #self.words = [word for word in self.words if (word not in self.stopwords) and len(word) > 2]
+        #self.words = [word for word in self.words if (word not in stopwords) and len(word) > 2]
+        self.words = [word for word in self.words if len(word) > 2]
+        return " ".join(self.words)
 
     def process_all_text(self, list_w):
         self.list_w = list_w
@@ -66,8 +72,8 @@ class extract_text_from_image(extract_text_and_process):
         #size = 7016, 4961
         self.img = img
         self.size_w, self.size_h = 600, 600    
-        if (self.img.size[0] < self.size_w) and (self.img.size[0] < self.size_h):
-            self.img = self.img.resize(self.size_w, self.size_h, Image.LANCZOS)
+        if (self.img.size[0] < self.size_w) and (self.img.size[1] < self.size_h):
+            self.img = self.img.resize((self.size_w, self.size_h))
         return self.img
 
     def noise_filters(self, img):
@@ -90,10 +96,22 @@ class extract_text_from_image(extract_text_and_process):
         pytesseract.pytesseract.tesseract_cmd = self.path_tesseract
 
         for i in range(self.count):
-            self.image = Image.open(self.list_paths[i])
-            self.image = self.preprocess_image(self.image)
-            self.text = pytesseract.image_to_string(self.image)
+            
+            
+            if Path(self.list_paths[i]).suffix == '.pdf':
+                doc = convert_from_path(self.list_paths[i], poppler_path=r'C:\Program Files\poppler-23.08.0\Library\bin')
+                #doc = convert_from_path(self.list_paths[i], poppler_path="")
+                #doc = convert_from_path(self.list_paths[i])
+                self.text = ''
+                for page_number, page_data in enumerate(doc):
+                    txt = pytesseract.image_to_string(page_data)
+                    self.text += txt
+            else:
+                self.image = Image.open(self.list_paths[i])
+                self.image = self.preprocess_image(self.image)
+                self.text = pytesseract.image_to_string(self.image)
             self.list_texts.append(self.text)
+        
         return self.list_texts
     
 
@@ -139,8 +157,8 @@ class process_attachments:
         self.path = file_path
         if Path(self.path).suffix in ['.csv', '.xls', '.xlsb', '.xlsm', '.xlsx', '.xml', '.ods']:
             self.file_type = "Tabular Data"
-        elif Path(self.path).suffix in ['.jpeg', '.jpg', '.png', 'pdf', '.tif', '.tiff']:
-            self.file_type = "Image Data"  
+        elif Path(self.path).suffix in ['.jpeg', '.jpg', '.png', '.pdf', '.tif', '.tiff']:
+            self.file_type = "Image Data"
         elif Path(self.path).suffix in ['.txt', '.doc', '.docx', '.odt', '.rtf', '.wpd']:
             self.file_type = "Text Data"
         else:
