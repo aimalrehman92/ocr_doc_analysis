@@ -230,12 +230,20 @@ class plagiarism_calculation:
         self.table_texts_list = table_texts
         #self.index_types = index_types
         if ((len(self.ocr_texts_list) !=0) or (len(self.doc_texts_list) !=0)) and (len(self.ocr_texts_list)+len(self.doc_texts_list) >= 2):
-            self.ocr_texts_list.extend(self.doc_texts_list)
+            self.ocr_texts_list.extend(self.doc_texts_list) # ['ocr1', 'ocr2', 'ocr3', 'text1', 'text2']
             self.index_types = list(index_types[1])
-            self.index_types.extend(list(index_types[2]))
-            #print(len(self.ocr_texts_list), len(self.index_types))
-            #print(self.index_types)
-            self.score_matrix = self.similarity_score(self.ocr_texts_list, self.index_types)
+            self.index_types.extend(list(index_types[2]))   # ['1', '4', '5', '2', '3'] -> [1, 2, 3, 4, 5]
+
+            temp_list = []
+
+            for index in self.index_types:
+                x = int(index) # 1
+                temp_list.append(self.ocr_texts_list[x-1])
+
+            self.index_types.sort()
+            self.temp_list = temp_list
+
+            self.score_matrix = self.similarity_score(self.temp_list, self.index_types)
         
         else:
             self.score_matrix = {"Attach_None": "NA"}
