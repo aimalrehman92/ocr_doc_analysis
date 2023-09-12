@@ -21,6 +21,7 @@ from docx import Document
 from abc import abstractmethod
 from pdf2image import convert_from_path
 
+
 ############################################# Classes on text extraction and text processing #############################################
 
 class extract_text_and_process:
@@ -71,8 +72,10 @@ class extract_text_from_image(extract_text_and_process):
     def check_and_adjust_dpi(self, img, size_w=600, size_h=600):
         #size = 7016, 4961
         self.img = img
+        self.threshold_w, self.threshold_h = 300, 300
         self.size_w, self.size_h = 600, 600    
-        if (self.img.size[0] < self.size_w) and (self.img.size[1] < self.size_h):
+        #print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+        if (self.img.size[0] < self.threshold_w) and (self.img.size[1] < self.threshold_h):
             self.img = self.img.resize((self.size_w, self.size_h))
         return self.img
 
@@ -83,8 +86,10 @@ class extract_text_from_image(extract_text_and_process):
 
     def preprocess_image(self, img):
         self.img = img
+        
+        #print("@@@@@@@@@@@@@@@@@@@@")
         self.img = self.check_and_adjust_dpi(self.img) # adjust dots per image
-        self.img = self.noise_filters(self.img)
+        #self.img = self.noise_filters(self.img)
         self.img = self.img.convert('L') # binarize
         return self.img
         
@@ -97,19 +102,21 @@ class extract_text_from_image(extract_text_and_process):
 
         for i in range(self.count):
             
-            
-            if Path(self.list_paths[i]).suffix == '.pdf':
+            if Path(self.list_paths[i]).suffix == 'pdf': # it should be .pdf
                 doc = convert_from_path(self.list_paths[i], poppler_path=r'C:\Program Files\poppler-23.08.0\Library\bin')
-                #doc = convert_from_path(self.list_paths[i], poppler_path="")
-                #doc = convert_from_path(self.list_paths[i])
                 self.text = ''
                 for page_number, page_data in enumerate(doc):
+                    #page_data = self.preprocess_image(page_data)
                     txt = pytesseract.image_to_string(page_data)
                     self.text += txt
             else:
                 self.image = Image.open(self.list_paths[i])
                 self.image = self.preprocess_image(self.image)
                 self.text = pytesseract.image_to_string(self.image)
+            
+            print("^^^^^^^^^^^^^^^^^^^^^^^^")
+            print(i)
+            print(self.text)
             self.list_texts.append(self.text)
         
         return self.list_texts
@@ -125,10 +132,18 @@ class extract_text_from_doc(extract_text_and_process):
         self.list_paths = list_paths
         self.texts_list = []
         for i in range(len(self.list_paths)):
-            self.doc = Document(self.list_paths[i])
-            self.string_one_file = ''
-            for j in range(len(self.doc.paragraphs)):
-                self.string_one_file = self.string_one_file + self.doc.paragraphs[j].text
+            
+            self.string_one_file = '' # placeholder !
+            
+            if Path(self.list_paths[i]).suffix == '.txt':
+                with open(self.list_paths[i]) as f:
+                    contents = f.read()
+                    self.string_one_file = self.string_one_file + contents
+                
+            elif Path(self.list_paths[i]).suffix == '.docx':
+                self.doc = Document(self.list_paths[i])
+                for j in range(len(self.doc.paragraphs)):
+                    self.string_one_file = self.string_one_file + self.doc.paragraphs[j].text
 
             self.texts_list.append(self.string_one_file)
              
@@ -157,9 +172,9 @@ class process_attachments:
         self.path = file_path
         if Path(self.path).suffix in ['.csv', '.xls', '.xlsb', '.xlsm', '.xlsx', '.xml', '.ods']:
             self.file_type = "Tabular Data"
-        elif Path(self.path).suffix in ['.jpeg', '.jpg', '.png', '.pdf', '.tif', '.tiff']:
+        elif Path(self.path).suffix in ['.jpeg', '.jpg', '.png']:
             self.file_type = "Image Data"
-        elif Path(self.path).suffix in ['.txt', '.doc', '.docx', '.odt', '.rtf', '.wpd']:
+        elif Path(self.path).suffix in ['.txt', '.docx']:
             self.file_type = "Text Data"
         else:
             self.file_type = "Junk"
@@ -205,9 +220,9 @@ class plagiarism_calculation:
 
     def similarity_score(self, list_w, index_types):
 
-        self.list_w = list_w
-        self.index_types = index_types
-        self.scores = {}
+        self.list_w = list_w # ['ocr1', 'text2', 'text1', 'ocr2', 'ocr3', 'ocr4]
+        self.index_types = index_types # [1, 2, 3, 4, 5, 6]
+        self.scores = {} 
         self.count = len(self.list_w)
         for i in range(self.count):
             #key = 'Attach_'+str(i+1)
@@ -221,6 +236,8 @@ class plagiarism_calculation:
                 self.scores[key].append(perc_dist)
     
         return self.scores
+    
+    #{'Attach_1': [, , , , ,], 'Attach_2': [],  .... }
 
     
     def similarity_score_all_types(self, ocr_texts, doc_texts, table_texts, index_types):
@@ -230,17 +247,27 @@ class plagiarism_calculation:
         self.table_texts_list = table_texts
         #self.index_types = index_types
         if ((len(self.ocr_texts_list) !=0) or (len(self.doc_texts_list) !=0)) and (len(self.ocr_texts_list)+len(self.doc_texts_list) >= 2):
-            self.ocr_texts_list.extend(self.doc_texts_list) # ['ocr1', 'ocr2', 'ocr3', 'text1', 'text2']
+            self.ocr_texts_list.extend(self.doc_texts_list) # ['ocr1', 'ocr2', 'ocr3', 'ocr4', 'text2', 'text1']
+                                                            #['ocr1', 'text2', 'text1', 'ocr2', 'ocr3', 'ocr4] # POSTMAN
             self.index_types = list(index_types[1])
-            self.index_types.extend(list(index_types[2]))   # ['1', '4', '5', '2', '3'] -> [1, 2, 3, 4, 5]
+            self.index_types.extend(list(index_types[2]))   # ['1', '4', '5', '6', '2', '3']
+            print("MUSAWER:", self.index_types)
 
             temp_list = []
 
-            for index in self.index_types:
-                x = int(index) # 1
-                temp_list.append(self.ocr_texts_list[x-1])
+            #for index in self.index_types:
+                #x = int(index) # 1
+                #temp_list.append(self.ocr_texts_list[x-1])
 
-            self.index_types.sort()
+
+            for i in range(len(self.index_types)):
+                #indx = self.index_types[i-1]
+                index = str(i+1)
+                true_index = self.index_types.index(index)
+                temp_list.append(self.ocr_texts_list[true_index])
+
+            
+            self.index_types.sort() # [1, 2, 3, 4, 5, 6]
             self.temp_list = temp_list
 
             self.score_matrix = self.similarity_score(self.temp_list, self.index_types)
@@ -266,7 +293,7 @@ class plagiarism_calculation:
 
     def filter_top_sim_score(self, score_matrix):
         
-        self.doc_names = list(score_matrix.keys())
+        self.doc_names = list(score_matrix.keys()) # [Attach_1, Attach_2, Attach_3, Attach_4, Attach_5, Attach_6]
         self.primary_output = []
         
         for key in score_matrix.keys():

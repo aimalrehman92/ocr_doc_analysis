@@ -35,6 +35,13 @@ def main_plagiarism_check():
             process_obj = process_attachments()
             list_types, index_types = process_obj.group_similar_file_types(list_paths)
 
+            print("****************************")
+            print(index_types)
+            print("***************************")
+            print(list_types)
+            print("###########################")
+            
+
             list_ocr_texts, list_doc_texts, list_table_texts = [], [], []
 
             #if len(list_types[0]) != 0:
@@ -53,7 +60,15 @@ def main_plagiarism_check():
                 list_doc_texts = extract_text_doc.process_all_text(list_doc_texts)
             
             plag_calc = plagiarism_calculation()
-        
+
+            #print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+            #print(list_ocr_texts)
+            #print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+            #print(list_doc_texts)
+
+            print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+            print(index_types)
+            
             output = plag_calc.similarity_score_all_types(list_ocr_texts, list_doc_texts, list_table_texts, index_types)
             
             if len(output) > 1:
