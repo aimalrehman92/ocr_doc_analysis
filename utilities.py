@@ -74,7 +74,7 @@ class extract_text_from_image(extract_text_and_process):
         self.img = img
         self.threshold_w, self.threshold_h = 300, 300
         self.size_w, self.size_h = 600, 600    
-        #print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+
         if (self.img.size[0] < self.threshold_w) and (self.img.size[1] < self.threshold_h):
             self.img = self.img.resize((self.size_w, self.size_h))
         return self.img
@@ -87,7 +87,7 @@ class extract_text_from_image(extract_text_and_process):
     def preprocess_image(self, img):
         self.img = img
         
-        #print("@@@@@@@@@@@@@@@@@@@@")
+
         self.img = self.check_and_adjust_dpi(self.img) # adjust dots per image
         #self.img = self.noise_filters(self.img)
         self.img = self.img.convert('L') # binarize
@@ -114,9 +114,6 @@ class extract_text_from_image(extract_text_and_process):
                 self.image = self.preprocess_image(self.image)
                 self.text = pytesseract.image_to_string(self.image)
             
-            print("^^^^^^^^^^^^^^^^^^^^^^^^")
-            print(i)
-            print(self.text)
             self.list_texts.append(self.text)
         
         return self.list_texts
@@ -251,7 +248,6 @@ class plagiarism_calculation:
                                                             #['ocr1', 'text2', 'text1', 'ocr2', 'ocr3', 'ocr4] # POSTMAN
             self.index_types = list(index_types[1])
             self.index_types.extend(list(index_types[2]))   # ['1', '4', '5', '6', '2', '3']
-            print("MUSAWER:", self.index_types)
 
             temp_list = []
 
@@ -331,11 +327,9 @@ class plagiarism_calculation:
             df = df.sort_values(by='perc_sim', ascending=False)
             df.reset_index(drop=True, inplace=True)
         df = df.head(5)
-        #print("***************************************")
-        #print(df)
+
         self.primary_output = df.values.tolist()
-        #print("---------------------------------------")
-        #print(df)
+
         self.final_output = {}
         self.final_output['primary_output'] = self.primary_output
         self.final_output['secondary_output'] = score_matrix

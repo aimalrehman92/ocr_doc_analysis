@@ -19,7 +19,6 @@ def main_plagiarism_check():
         req_json = request.json
         attachments_len = len(req_json)
         
-        #print("LET US CHECK THE LENGTH: ", attachments_len)
         dummy_output = {"primary_output":{"Attach_None":["NA"]}, "secondary_output": {"Attach_None": "NA"}} # Placeholder!
 
         if attachments_len <= 1:
@@ -33,14 +32,7 @@ def main_plagiarism_check():
                 list_paths.append(req_json[str(ii)])
 
             process_obj = process_attachments()
-            list_types, index_types = process_obj.group_similar_file_types(list_paths)
-
-            print("****************************")
-            print(index_types)
-            print("***************************")
-            print(list_types)
-            print("###########################")
-            
+            list_types, index_types = process_obj.group_similar_file_types(list_paths)        
 
             list_ocr_texts, list_doc_texts, list_table_texts = [], [], []
 
