@@ -60,14 +60,6 @@ def main_plagiarism_check():
                 list_doc_texts = extract_text_doc.process_all_text(list_doc_texts)
             
             plag_calc = plagiarism_calculation()
-
-            #print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-            #print(list_ocr_texts)
-            #print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-            #print(list_doc_texts)
-
-            print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-            print(index_types)
             
             output = plag_calc.similarity_score_all_types(list_ocr_texts, list_doc_texts, list_table_texts, index_types)
             
