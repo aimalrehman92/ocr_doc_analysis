@@ -37,6 +37,7 @@ This Python service runs plagiarism report on the uploaded images and/or text do
     - flask --app flask_class_plag_calc.py run --host=0.0.0.0 --port=5000
 \   The first command is for the latest version of application and future versions to come
     The second command is for the pilot demo of the plagiarism calculation application
+\
 &nbsp;
 - Remember that plagiarism report can be viewed at http://127.0.0.1:5000/plagiarism_calculation/
 
