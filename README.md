@@ -9,12 +9,10 @@ This Python service runs plagiarism report on the uploaded images and/or text do
     - python -m venv /path/to/new/virtual/environment 
 \
 &nbsp;
-
 - Navigate to that directory and activate the environment by running the following command in the terminal
     - Scripts\Activate
 \
 &nbsp;
-
 - Install the following dependencies:
     - pip install pandas
     - pip install pytesseract
@@ -30,14 +28,16 @@ This Python service runs plagiarism report on the uploaded images and/or text do
     - pip install --trusted-host=pypi.org --trusted-host=files.pythonhosted.org pytesseract
 \
 &nbsp;
-
-- Now run the Flask app on your local (Server: http://127.0.0.1:5000) by running this command on terminal:
+- Activate the environment by typing in the terminal:
+    - Scripts\Activate
+\
+&nbsp;
+- Now run the Flask app on terminal by running any of the two, as desired:
     - flask --app f1_plagiarism_calc.py run OR
     - flask --app flask_class_plag_calc.py run --host=0.0.0.0 --port=5000
 \   The first command is for the latest version of application and future versions to come
     The second command is for the pilot demo of the plagiarism calculation application
 &nbsp;
-
 - Remember that plagiarism report can be viewed at http://127.0.0.1:5000/plagiarism_calculation/
 
 ## Brief description about the functionality
