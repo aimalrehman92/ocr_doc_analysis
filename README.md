@@ -4,7 +4,10 @@ This Python service runs plagiarism report on the uploaded images and/or text do
 
 ## How to deploy it on your system from scratch?
 
-- Create a directory in your local
+- Git clone this repo in a directory
+\
+&nbsp;
+
 - Navigate to that directory and create Python virtual environment (Python 3.9.13 or 3.9.x) using the following command:
     - python -m venv /path/to/new/virtual/environment 
 \
