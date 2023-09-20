@@ -27,8 +27,7 @@ This Python service runs plagiarism report on the uploaded images and/or text do
     - pip install pdf2image
 \
 &nbsp;
-    If installation for any module (e.g. pytesseract) is blocked by CloudFlare, try adding sources to trusted-host, e.g.:
-    - pip install --trusted-host=pypi.org --trusted-host=files.pythonhosted.org pytesseract
+    If installation for any module (e.g. pytesseract) is blocked by CloudFlare, try adding sources to trusted-host, e.g: pip install --trusted-host=pypi.org --trusted-host=files.pythonhosted.org pytesseract
 \
 &nbsp;
 - Next, install Tesseract-OCR from the link: https://github.com/UB-Mannheim/tesseract/wiki
