@@ -31,11 +31,18 @@ This Python service runs plagiarism report on the uploaded images and/or text do
     - pip install --trusted-host=pypi.org --trusted-host=files.pythonhosted.org pytesseract
 \
 &nbsp;
-- Activate the environment by typing in the terminal:
-    - Scripts\Activate
+- Next, install Tesseract-OCR from the link: https://github.com/UB-Mannheim/tesseract/wiki
+During installation, it is recommended to install it in the following path:
+"C:\Program Files\Tesseract-OCR\"
+If a different path is chosen, please note it down and paste it in the script "alivia_text_library" as "self.path_tesseract"
 \
 &nbsp;
-- Now run the Flask app on terminal by running any of the two, as desired:
+- Next, install Poppler Release 23.08.0 as a zip file from the link: https://github.com/oschwartz10612/poppler-windows/releases/
+It is recommended to unzip it in the following path
+"C:\Program Files\"
+If a different path is chosen, please note it down and paste it in the script "alivia_text_library" as "self.poppler_path"
+
+- Assuming that the environment is still activate, now run the Flask app on terminal by running any of the two, as desired:
     - flask --app f1_plagiarism_calc.py run OR
     - flask --app flask_class_plag_calc.py run --host=0.0.0.0 --port=5000
 \   The first command is for the latest version of application and future versions to come
@@ -43,6 +50,12 @@ This Python service runs plagiarism report on the uploaded images and/or text do
 \
 &nbsp;
 - Remember that plagiarism report can be viewed at http://127.0.0.1:5000/plagiarism_calculation/
+
+## How to run deployed service manually?
+
+- Open terminal and navigate to the directory of this code
+- Type the command: Scripts\Activate (This will activate the environment)
+- Now, type the command: flask --app f1_plagiarism_calc.py run (to run the plagiarism calculation application)
 
 ## Brief description about the functionality
 
