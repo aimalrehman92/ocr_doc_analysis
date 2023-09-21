@@ -34,7 +34,7 @@ class process_attachments:
         self.path = file_path
         if Path(self.path).suffix in ['.csv', '.xls', '.xlsb', '.xlsm', '.xlsx', '.xml', '.ods']:
             self.file_type = "Tabular Data"
-        elif Path(self.path).suffix in ['.jpeg', '.jpg', '.png', '.pdf', '.tiff']:
+        elif Path(self.path).suffix in ['.jpeg', '.jpg', '.png', '.pdf', '.tiff', '.tif']:
             self.file_type = "Image Data"
         elif Path(self.path).suffix in ['.txt', '.docx']:
             self.file_type = "Text Data"
