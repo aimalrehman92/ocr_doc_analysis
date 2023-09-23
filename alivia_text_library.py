@@ -146,7 +146,7 @@ class extract_text_from_doc(extract_text_and_process):
             for j in range(len(self.doc.paragraphs)):
                 self.string_one_file = self.string_one_file + self.doc.paragraphs[j].text
           
-            self.texts_list = self.string_one_file
+        self.texts_list = self.string_one_file
  
         return self.texts_list
     
