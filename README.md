@@ -63,7 +63,7 @@ This Python application can run plagiarism report by receiving mulitple files at
 ['.txt', '.docx']
 
 - For images, it can extract text from the following formats:
-['.jpeg', '.jpg', '.png', 'pdf', '.tiff']
+['.jpeg', '.jpg', '.png', 'pdf', '.tiff', '.tif'],
 
 Output report consist of 'Primary Output' and Secondary Output'. The Primary Output shows highest similarity and the corresponding document, for each uploaded document. The Secondary Output displays similarity matrix containing percentage similarity for all possible pairs of the documents uploaded.
 
