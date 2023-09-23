@@ -38,7 +38,7 @@ def main():
         #table_name = req_json[""]
         #READ rest of the keys from the input JSON
 
-        url = "localhost:1433;databaseName=ai_analysis;integratedsecurity=true;"
+        url = "localhost:1433;databaseName=FakeDataUS;integratedsecurity=true;"
 
         # Perform string parsing
         url_parts = url.split(";")
@@ -56,17 +56,26 @@ def main():
         cursor = conn.cursor()
 
         # Example query
-        cursor.execute("SELECT * FROM ALIV_MedicalClaimAll where calimSeq = 741988;")
+        cursor.execute("SELECT MemberName, ServiceToDate, ProcedureCode, ProcedureDescription FROM ALIV_MedicalClaimAll where claimSeq = 2200;")
         some_table = cursor.fetchall()
+        print('some some some',)
+        some_table = pd.DataFrame(some_table)
+        some_table = some_table.values[0]
+        print('this is the head of some table', some_table)
 
         # Close cursor and connection
         cursor.close()
         conn.close()
-    
-        mem_name = some_table[some_table['key'] == 'Member name']['value'].values[0]
-        dos = some_table[some_table['key'] == 'Date of Service']['value'].values[0]
-        proc_code = some_table[some_table['key'] == 'Procedure Code']['value'].values[0]
-        proc_des = some_table[some_table['key'] == 'Procedure Description']['value'].values[0]
+
+        mem_name = some_table[0][0]
+        dos = some_table[0][1]
+        proc_code = some_table[0][2]
+        proc_des = some_table[0][3]
+
+        # mem_name = some_table[some_table['key'] == 'MemberName']['value'].values[0]
+        # dos = some_table[some_table['key'] == 'ServiceToDate']['value'].values[0]
+        # proc_code = some_table[some_table['key'] == 'ProcedureCode']['value'].values[0]
+        # proc_des = some_table[some_table['key'] == 'ProcedureDescription']['value'].values[0]
 
         values_list = [mem_name, dos, proc_code, proc_des]
     
