@@ -97,3 +97,35 @@ class plagiarism_calculation:
         return self.final_output
 
         
+    def uni_directional_plagiarism(self, set_values, text_bucket):
+
+        score_per_doc = []
+
+        #print("Set of values: ", set_values)
+        #print(text_bucket.split())
+
+        member_name, dos, proc_code, proc_des = set_values[0], set_values[1], set_values[2], set_values[3]
+
+        if member_name in text_bucket:
+            score_per_doc.append(1)
+        else:
+            score_per_doc.append(0)
+        
+        if proc_code in text_bucket:
+            score_per_doc.append(1)
+        else:
+            score_per_doc.append(0)
+        
+        if proc_des in text_bucket:
+            score_per_doc.append(1)
+        else:
+            score_per_doc.append(0)
+        
+        if dos in text_bucket:
+            score_per_doc.append(1)
+        else:
+            score_per_doc.append(0)
+
+        #return round(score*100.0/4.0, 2)
+        return score_per_doc
+    

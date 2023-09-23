@@ -132,20 +132,22 @@ class extract_text_from_doc(extract_text_and_process):
         pass
 
     def extract_text(self, list_paths):   
+        
         self.list_paths = list_paths
-        self.texts_list = []
-        for i in range(len(self.list_paths)):
-            self.string_one_file = '' # placeholder !
-            if Path(self.list_paths[i]).suffix == '.txt':
-                with open(self.list_paths[i]) as f:
-                    contents = f.read()
-                    self.string_one_file = self.string_one_file + contents
-            elif Path(self.list_paths[i]).suffix == '.docx':
-                self.doc = Document(self.list_paths[i])
-                for j in range(len(self.doc.paragraphs)):
-                    self.string_one_file = self.string_one_file + self.doc.paragraphs[j].text
-            self.texts_list.append(self.string_one_file)
-             
+       
+        self.string_one_file = '' # placeholder !
+        if Path(self.list_paths).suffix == '.txt':
+            with open(self.list_paths) as f:
+                contents = f.read()
+                self.string_one_file = self.string_one_file + contents
+        
+        elif Path(self.list_paths).suffix == '.docx':
+            self.doc = Document(self.list_paths)
+            for j in range(len(self.doc.paragraphs)):
+                self.string_one_file = self.string_one_file + self.doc.paragraphs[j].text
+          
+            self.texts_list = self.string_one_file
+ 
         return self.texts_list
     
 
