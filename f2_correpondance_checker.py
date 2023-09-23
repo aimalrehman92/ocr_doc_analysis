@@ -18,9 +18,6 @@ app.json.sort_keys = False
 
 def main():
 
-    #some_table = pd.read_csv("some_table.csv")
-    #print(some_table.head()) # MOCK TABLE READ FROM LOCAL FOR PRACTICE
-
     if request.method == "GET":
         
         return jsonify({"response":"This is prepay OCR application. Welcome !!!"})
@@ -28,7 +25,6 @@ def main():
     elif request.method == "POST":
         req_json = request.json
         #attachments_len = len(req_json)
-        
         paths_list = req_json["attachments"]
         
         #path_1 = "C:\\Users\\MuhammadAimalRehman\\Documents\\OCR_Project\\PyTesseract_Demo_01\\pytesser_demo\\Data_for_SimilarityDetection\\make_believe_medrec.docx"
@@ -38,7 +34,7 @@ def main():
         #table_name = req_json[""]
         #READ rest of the keys from the input JSON
 
-        url = "localhost:1433;databaseName=FakeDataUS;integratedsecurity=true;"
+        url = req_json["connectionString"]
 
         # Perform string parsing
         url_parts = url.split(";")
@@ -55,13 +51,13 @@ def main():
         # Create a cursor
         cursor = conn.cursor()
 
-        # Example query
-        cursor.execute("SELECT MemberName, ServiceToDate, ProcedureCode, ProcedureDescription FROM ALIV_MedicalClaimAll where claimSeq = 2200;")
+        claimSeq = req_json["claimSeq"]
+        tableName = req_json["tableName"]
+        query = f"SELECT MemberName, ServiceToDate, ProcedureCode, ProcedureDescription FROM {tableName} WHERE claimSeq = {claimSeq};"
+        cursor.execute(query)
         some_table = cursor.fetchall()
-        print('some some some',)
         some_table = pd.DataFrame(some_table)
         some_table = some_table.values[0]
-        print('this is the head of some table', some_table)
 
         # Close cursor and connection
         cursor.close()
@@ -97,7 +93,6 @@ def main():
             elif proc_attach.detect_file_type(path) == "Text Data":
                 text = extract_from_doc.extract_text(path)
                 #text = extract_from_doc.process_single_string(text)
-
             score_dict["Attach_"+str(file_count)] = plagiarism_calc.uni_directional_plagiarism(values_list, text)
         
             file_count += 1
@@ -105,7 +100,7 @@ def main():
     
         #score_dict = pd.DataFrame.from_dict(score_dict)
         #score_dict = score_dict.max(axis=1) # aggregate
-    
+
         df = pd.DataFrame()
         df['parameter'] = ['Member Name', 'DOS','Procedure Code', 'Procedure Description']
 
@@ -114,11 +109,14 @@ def main():
 
         df['results'] = df.iloc[:, 1:].max(axis=1)
 
-        df = df[['parameter', 'results']]
+        df = df.set_index('parameter')  # Set 'parameter' column as the index
+        df['results'] = df['results'].astype('bool')  # Convert results to strings
 
-        print(df) # JUST TO BE SURE !!!!
-    
-        return jsonify(df)
+        # Convert the DataFrame to a dictionary with 'results' as values
+        output_data = df['results'].to_dict()
+
+        output = {"data": output_data}
+        return jsonify(output)
 
 
 if __name__ == '__main__':
