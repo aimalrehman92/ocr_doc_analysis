@@ -88,7 +88,7 @@ def main():
             # proc_des = some_table[some_table['key'] == 'ProcedureDescription']['value'].values[0]
 
             values_list = [mem_name, dos, proc_code, proc_des]
-    
+            values_list = [str(i) for i in values_list]
             proc_attach = process_attachments()
             extract_from_doc = extract_text_from_doc()
             extract_from_image = extract_text_from_image()
