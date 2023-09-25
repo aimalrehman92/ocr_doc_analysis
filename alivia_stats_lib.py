@@ -111,17 +111,17 @@ class plagiarism_calculation:
         else:
             score_per_doc.append(0)
         
+        if dos in text_bucket:
+            score_per_doc.append(1)
+        else:
+            score_per_doc.append(0)
+        
         if proc_code in text_bucket:
             score_per_doc.append(1)
         else:
             score_per_doc.append(0)
         
         if proc_des in text_bucket:
-            score_per_doc.append(1)
-        else:
-            score_per_doc.append(0)
-        
-        if dos in text_bucket:
             score_per_doc.append(1)
         else:
             score_per_doc.append(0)
