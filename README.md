@@ -35,6 +35,10 @@ In case of any issue, use the following commands to install the modules one by o
     - pip install flask
     - pip install pdf2image
     - pip install pyodbc
+    - pip install fpdf
+    - pip install docx2pdf
+    - pip install pywin32
+
 
 If installation for any module (e.g. pytesseract) is blocked by CloudFlare, try adding sources to trusted-host, e.g: pip install --trusted-host=pypi.org --trusted-host=files.pythonhosted.org pytesseract
 &nbsp;
