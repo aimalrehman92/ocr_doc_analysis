@@ -1,14 +1,11 @@
 
-
-
-from alivia_text_library import extract_text_from_image, extract_text_from_doc
-from alivia_process_files import process_attachments
-from alivia_stats_lib import plagiarism_calculation
+from alivia_text_image_library import ExtractImageText, ExtractDocumentText
+from alivia_process_files import ProcessAttachments
+from alivia_stats_library import PlagiarismCalculation
 from flask import Flask, request, jsonify
 
 import pandas as pd
 import pyodbc
-
 
 app = Flask(__name__)
 app.json.sort_keys = False
@@ -89,10 +86,10 @@ def main():
 
             values_list = [mem_name, dos, proc_code, proc_des]
             values_list = [str(i) for i in values_list]
-            proc_attach = process_attachments()
-            extract_from_doc = extract_text_from_doc()
-            extract_from_image = extract_text_from_image()
-            plagiarism_calc = plagiarism_calculation()
+            proc_attach = ProcessAttachments()
+            extract_from_doc = ExtractDocumentText()
+            extract_from_image = ExtractImageText()
+            plagiarism_calc = PlagiarismCalculation()
 
             score_dict = {}
             file_count = 0
