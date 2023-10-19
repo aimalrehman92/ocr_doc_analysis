@@ -79,7 +79,10 @@ class ExtractImageText(ExtractTextAndProcess):
     def __init__(self):
         
         self.path_tesseract = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-        self.poppler_path = r'C:\Program Files\poppler-23.08.0\Library\bin'
+        #self.poppler_path = r'C:\Program Files\poppler-23.08.0\Library\bin'
+
+        #self.path_tesseract = os.getcwd() + r'\Tesseract-OCR\tesseract-5.3.1\tesseract.exe'
+        self.poppler_path = os.getcwd() + r'\poppler-23.08.0\Library\bin'
 
 
     def check_and_adjust_dpi(self, img, size_w=600, size_h=600):
