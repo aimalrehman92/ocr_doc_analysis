@@ -22,6 +22,7 @@ from abc import abstractmethod
 from pdf2image import convert_from_path
 
 from datetime import datetime
+import PyPDF2
 
 ############################################# Classes on text extraction and text processing #############################################
 
@@ -271,6 +272,68 @@ class ReturnImageData:
         f.close()
 
         return file_path
+    
+
+    def create_outline(self, pdf_file, document_text, document_meta_data, text_to_mark, keys_found, output_pdf_file):
+        
+        pdf = PyPDF2.PdfReader(open(pdf_file, "rb"))
+        pdf_writer = PyPDF2.PdfWriter()
+
+        for page_num in range(len(pdf.pages)):
+            print(page_num)
+            page = pdf.pages[page_num]
+            pdf_writer.add_page(page)
+
+            page_text = document_meta_data[document_meta_data['page_num'] == page_num+1]['text'].tolist()
+            #page_text = document_text
+            #page_text = page.extract_text()
+
+            #document_meta_data[]
+
+            for i in range(len(text_to_mark)):
+
+                text_string = text_to_mark[i]
+
+                if text_string in page_text:
+                    print("Heading found!", page_num)
+                    #bookmark = pdf_writer.addBookmark(heading, page_num)
+                    bookmark= pdf_writer.add_outline_item(keys_found[i], page_num)
+                    # You can set the indentation level of the bookmark if needed
+                    #bookmark.setDestination(page_num)
+
+
+        with open(output_pdf_file, "wb") as output_pdf:
+            pdf_writer.write(output_pdf)
+        
+        
+    
+    def create_outline_old(self, pdf_file, headings_to_mark, output_pdf_file):
+        pdf = PyPDF2.PdfReader(open(pdf_file, "rb"))
+        pdf_writer = PyPDF2.PdfWriter()
+
+        for page_num in range(len(pdf.pages)):
+            #page = pdf.getPage(page_num)
+            page = pdf.pages[page_num]
+            pdf_writer.add_page(page)
+
+            page_text = page.extract_text()
+
+            for heading in headings_to_mark:
+                print("///////////////")
+                print(heading)
+                print(page_text) # THIS IS THE ISSUE AIMAL !!! RESOLVE IT BY REMOVING THIS PART AND USING THE LIST_TEXT_DATA FROM THE MAIN FILE
+                if heading in page_text:
+                    print("Heading Found!")
+                    #bookmark = pdf_writer.addBookmark(heading, page_num)
+                    bookmark= pdf_writer.add_outline_item(heading, page_num)
+                    # You can set the indentation level of the bookmark if needed
+                    bookmark.setDestination(page_num)
+
+        with open(output_pdf_file, "wb") as output_pdf:
+            pdf_writer.write(output_pdf)
+        
+        return None
+        
         
 
 if __name__ == '__main__':
