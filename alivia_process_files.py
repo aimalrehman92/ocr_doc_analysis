@@ -6,7 +6,7 @@ from pathlib import Path
 from fpdf import FPDF
 from docx2pdf import convert
 import os
-from PIL import Image
+from PIL import Image,ImageFilter
 import logging
 import pythoncom
 ############################################# Process attachments #############################################
@@ -79,7 +79,7 @@ class ProcessAttachments:
 
             # Set font for the PDF
             pdf.set_font("Arial", size=11)
-            # Read the text content from the input file
+            # Read the text content from the input filec1
             with open(input_file, 'r') as file:
                 lines = file.readlines()
            
@@ -109,7 +109,7 @@ class ProcessAttachments:
         return output_file
     
 
-    def save_temp_images(self, img_numpy, index):
+    def save_temp_images(self, image_numpy, index):
         
         # This function will save image in the local memory for temporary use
         
@@ -118,14 +118,29 @@ class ProcessAttachments:
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
         
-        temp_path = temp_dir + f"temp_img_{index}.jpg"
+        temp_path = temp_dir + f"temp_img_{index}.jpg"        
+        image = Image.fromarray(image_numpy, "RGB")
+
+        # Define the desired new size (resolution)
+        new_width = image.width * 1
+        new_height = image.height * 1
+
+        # Resize the image to the new size using the nearest-neighbor resampling method
+        upscaled_image = image.resize((new_width, new_height), Image.NEAREST)
+
+        upscaled_image.save(temp_path)
+
+        #dpi = image.info.get("dpi")
+        #print("DOTS PER IMAGE: ", dpi)
+        #upscaled_image = upscaled_image.filter(ImageFilter.SHARPEN)
+        upscaled_image = upscaled_image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
         
-        img = Image.fromarray(img_numpy, "RGB")
-        img.save(temp_path)
+        #image_size = image_numpy.shape
+        image_size = new_width, new_height
+
+        print("IMAGE SIZE and TYPE", image_size, type(image))
         
-        img_size = img_numpy.shape
-        
-        return temp_path, img_size
+        return temp_path, image_size
     
 
     def images_to_pdf(self, list_numpy_images, index):
@@ -147,7 +162,8 @@ class ProcessAttachments:
             temp_path, img_size = self.save_temp_images(list_numpy_images[j], j)
             #w, h, c = img_size
             pdf.add_page()
-            pdf.image(temp_path, 10, 10, 180)
+            #pdf.image(temp_path, 10, 10, 180)
+            pdf.image(temp_path, 5, 5, 210)
 
         pdf.output(output_pdf_path)
 

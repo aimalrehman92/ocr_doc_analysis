@@ -118,6 +118,8 @@ class PlagiarismCalculation:
     def uni_directional_plagiarism(self, set_values, set_mechanism, text_bucket):
 
         score_per_doc = []
+        
+        text_bucket = " ".join(text_bucket)
 
         for i in range(len(set_values)):
             

@@ -31,7 +31,11 @@ def main():
         
             list_paths = req_json["attachments"]
 
-            dummy_output = {'data': {'Member Name': False, 'DOS': False, 'Procedure Code': False, 'Procedure Description': False}} # Placeholder !
+            dummy_image = return_image.null_image((256, 256, 3))
+            #dummy_output = {"Doc_1": dummy_image, "Doc_2": dummy_image} # Placeholder!
+
+            dummy_output = {'data': {'Member Name': False, 'DOS': False, 'Procedure Code': False, 'Procedure Description': False}, 
+                            'pointers': "give some placeholder paths here!"} # Placeholder !
         
             if len(list_paths) < 1:
 
@@ -75,10 +79,10 @@ def main():
                 proc_des = some_table[0][3]
 
                 values_list = [mem_name, dos, proc_code, proc_des]
-                values_list = [str(i) for i in values_list]
+                values_list = [str(i) for i in values_list] # ensure that they are string type and never None
 
-                customer_keys = ['Member name', 'Date of Service', 'Procedure Code', 'Procedure Description']
-                mechanism_list = ["exact", "exact", "exact", "exact"]
+                customer_keys = ['Member name', 'Date of Service', 'Procedure Code', 'Procedure Description'] # fixed case for parameters for now
+                mechanism_list = ["exact", "exact", "exact", "exact"] # how to treat each parameter
 
                 plagiarism_calc = PlagiarismCalculation()
                 return_image = ReturnImageData()
@@ -86,20 +90,20 @@ def main():
                 extract_from_image = ExtractImageText()
                 #extract_from_doc = ExtractDocumentText()
 
-                image = return_image.null_image((256, 256, 3))
-                dummy_output = {"Doc_1": image, "Doc_2": image} # Placeholder!
+                #image = return_image.null_image((256, 256, 3))
+                #dummy_output = {"Doc_1": image, "Doc_2": image} # Placeholder!
 
                 ### Read and collect all the data from the documents stored ###
                 list_meta_data, list_image_data, list_text_data = [], [], []
 
-                for attach_no in range(len(list_paths)):
+                for file_count in range(len(list_paths)):
                 
-                    path = list_paths[attach_no]
+                    path = list_paths[file_count]
                     print(path)
 
                     if proc_attach.detect_file_type(path) == "Text Data":
-                        path = proc_attach.txt_docs_to_pdf(path, attach_no)
-                        list_paths[attach_no] = path
+                        path = proc_attach.txt_docs_to_pdf(path, file_count)
+                        list_paths[file_count] = path
         
                     text = extract_from_image.extract_text(path)
                     text = extract_from_image.process_single_string(text) # if string cleaning + conversion to list of words
@@ -112,22 +116,21 @@ def main():
                     list_image_data.append(page_images)
 
             
-                ### This section helps computing the correspondence score ###
+                ### Using the collected data from the above loop, we will now see:
+                # 1. what values are found in each attached document?
+                # 2. highlight the text found on the corresponding pages of each document
+                # 3. create an outline for the headings/found text in that document
+                ###
+                
                 output_paths = []
+                score_dict = {}
+
                 for file_count in range(len(list_paths)):
                 
                     text = list_text_data[file_count]
                     meta = list_meta_data[file_count]
                     image_doc = list_image_data[file_count]
 
-                    print(type(text), type(meta), type(image_doc))
-                    #print(text)
-                    print(meta.tail(2))
-                    #import numpy as np
-                    #print(np.array(image_doc).shape)
-
-                    score_dict = {} # for each file
-    
                     binary_values = plagiarism_calc.uni_directional_plagiarism(values_list, mechanism_list, text)
                     score_dict["Attach_"+str(file_count)] = binary_values
 
@@ -136,8 +139,8 @@ def main():
                     values_found = [values_list[i] for i in indices]
                     keys_found = [customer_keys[i] for i in indices]
 
-                    print("***************************")
-                    print("Values found:", values_found)
+                    print("File count:", file_count)
+                    print("values_found", values_found)
 
                     # values_found_lower = [values_found[i].lower() for i in range(len(values_found)) if type(values_found[i]) == 'str']
 

@@ -209,29 +209,58 @@ class ReturnImageData:
         image = np.zeros(dimensions)
         return image
 
+
     def cv_image(self, path):
         image = cv2.imread(path)
         return image
     
+
+    def split_and_repopulate_string_list(self, string_list):
+        new_list = []
+        for s in string_list:
+            if " " in s: #or not s.isalpha():
+                # Split the string by spaces and add resulting words to the new list
+                words = s.split()
+                new_list.extend(words)
+            else:
+                new_list.append(s)
+        return new_list
+
+
     def highlight_text_on_image(self, ocr_meta_data, common_words, ocr_images, img_num):
         
         no_of_pages = len(ocr_images)
+        common_words =  self.split_and_repopulate_string_list(common_words)
+
+        print("These are values for the keys in the database")
+        print(common_words)
+        margin = 6
         for ii in range(no_of_pages): # loop over the pages within a document
             ocr_image = ocr_images[ii]  # a page
             ocr_image = np.array(ocr_image)
             meta_data = ocr_meta_data[ocr_meta_data['page_num'] == ii+1].copy()
+
             for text in common_words:
                 retrieved_info = meta_data.loc[meta_data['text'] == text, ['left', 'top', 'width', 'height']]
                 if len(retrieved_info) > 0:
                     useful_coord = meta_data.loc[meta_data['text'] == text, ['left', 'top', 'width', 'height']].reset_index(drop=True).values[0]
                     x, y, w, h = useful_coord[0], useful_coord[1], useful_coord[2], useful_coord[3]
-                    #sub_img = ocr_image[y : y + h, x : x + w]
-                    #white_rect = np.ones(sub_img.shape, dtype=np.uint8) * 255
+                    sub_img = ocr_image[y-margin : y + h+margin, x-margin : x + w + margin]
+                    white_rect = np.ones(sub_img.shape, dtype=np.uint8) * 255
                     #res = cv2.addWeighted(sub_img, 0.2, white_rect, 0.5, 0)
-                    #ocr_image[y : y + h, x : x + w] = res
-                    cv2.rectangle(ocr_image, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                    res = cv2.addWeighted(sub_img, 0.2, white_rect, 0.5, 1)
+                    ocr_image[y-margin : y + h+margin, x-margin : x + w+margin] = res
+                    #cv2.rectangle(ocr_image, (x-margin, y-margin), (x + w+margin, y + h+margin), (0, 0, 255), 2)
+                    
+                    #mask = np.zeros(ocr_image.shape, dtype=np.uint8)
+                    #cv2.rectangle(mask, (x-margin, y-margin), (x + w+margin, y + h+margin), (0, 255, 255, 128), thickness=cv2.FILLED)
+                    #ocr_image = cv2.addWeighted(ocr_image, 1, mask, 0.4, 0) # bunch of post_processing lines
+
+                    #ocr_image = cv2.convertScaleAbs(ocr_image, alpha=1, beta=-5) # part of pos_processing
             
-            ocr_image = cv2.resize(ocr_image, (700, 900))
+            #ocr_image = cv2.resize(ocr_image, (700, 900))
+            ocr_image = cv2.resize(ocr_image, (2480, 3508)) # A4 resolution
+
             ocr_images[ii] = ocr_image        
         # store the PDF or IMAGE file and return its path
         #image_path = f"plagiarised_img_{img_num}.pdf"
@@ -280,22 +309,36 @@ class ReturnImageData:
         pdf_writer = PyPDF2.PdfWriter()
 
         for page_num in range(len(pdf.pages)):
-            print(page_num)
+            
             page = pdf.pages[page_num]
             pdf_writer.add_page(page)
 
             page_text = document_meta_data[document_meta_data['page_num'] == page_num+1]['text'].tolist()
+            page_text = " ".join(page_text)
+
+            #prints("--------------------------------------------")
+            #print(page_text)
+            #print("--------------------------------------------")
             #page_text = document_text
             #page_text = page.extract_text()
 
             #document_meta_data[]
 
+            #print("----------------------------")
+            #print("What is text to mark anyway ?")
+            #print(text_to_mark)
+            #print("----------------------------")
+
             for i in range(len(text_to_mark)):
 
                 text_string = text_to_mark[i]
 
+                #print("----------------------------------")
+                #print(text_string)
+                #print("----------------------------------")
+
                 if text_string in page_text:
-                    print("Heading found!", page_num)
+                    #print("Heading found!", page_num)
                     #bookmark = pdf_writer.addBookmark(heading, page_num)
                     bookmark= pdf_writer.add_outline_item(keys_found[i], page_num)
                     # You can set the indentation level of the bookmark if needed
@@ -305,6 +348,8 @@ class ReturnImageData:
         with open(output_pdf_file, "wb") as output_pdf:
             pdf_writer.write(output_pdf)
         
+        output_pdf.close()
+
         
     
     def create_outline_old(self, pdf_file, headings_to_mark, output_pdf_file):
@@ -319,11 +364,11 @@ class ReturnImageData:
             page_text = page.extract_text()
 
             for heading in headings_to_mark:
-                print("///////////////")
-                print(heading)
-                print(page_text) # THIS IS THE ISSUE AIMAL !!! RESOLVE IT BY REMOVING THIS PART AND USING THE LIST_TEXT_DATA FROM THE MAIN FILE
+                #print("///////////////")
+                #print(heading)
+                #print(page_text) # THIS IS THE ISSUE AIMAL !!! RESOLVE IT BY REMOVING THIS PART AND USING THE LIST_TEXT_DATA FROM THE MAIN FILE
                 if heading in page_text:
-                    print("Heading Found!")
+                    #print("Heading Found!")
                     #bookmark = pdf_writer.addBookmark(heading, page_num)
                     bookmark= pdf_writer.add_outline_item(heading, page_num)
                     # You can set the indentation level of the bookmark if needed
