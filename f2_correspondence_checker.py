@@ -14,43 +14,47 @@ import os
 app = Flask(__name__)
 app.json.sort_keys = False
 
-@app.route('/prepay_correspondance_check_arizona', methods=['GET', 'POST'])
+@app.route('/prepay_correspondance_check', methods=['GET', 'POST'])
 
 def main():
     
     if request.method == "GET":
-        
+        print('i am in get function');
         return jsonify({"response":"This is OCR-based correspondence checking application in Prepay. Welcome !!!"})
 
     elif request.method == "POST":
-        
+        print('i am in else state')
         handle_error = HandleErrorLogs()
         
         try:
             req_json = request.json
-        
+            print('this is the requested json', req_json)
             list_paths = req_json["attachments"]
+            print('this is the requested list_paths', list_paths)
 
-            dummy_image = return_image.null_image((256, 256, 3))
-            #dummy_output = {"Doc_1": dummy_image, "Doc_2": dummy_image} # Placeholder!
+            # dummy_image = return_image.null_image((256, 256, 3))
+            # print('this is hte dmmy', dummy_image)
+            # #dummy_output = {"Doc_1": dummy_image, "Doc_2": dummy_image} # Placeholder!
 
-            dummy_output = {'data': {'Member Name': False, 'DOS': False, 'Procedure Code': False, 'Procedure Description': False}, 
-                            'pointers': "give some placeholder paths here!"} # Placeholder !
+            # dummy_output = {'data': {'Member Name': False, 'DOS': False, 'Procedure Code': False, 'Procedure Description': False}, 
+            #                 'pointers': "give some placeholder paths here!"} # Placeholder !
+            
         
             if len(list_paths) < 1:
-
-                output = dummy_output
-                print(output)
+                print('i am in if state and we have valid attachments')
+                # output = dummy_output
+                # print(output)
+                pass
         
             else:
-        
+                print('i am in else state and we have valid attachments')
                 url = req_json["connectionString"]
-
                 # Perform string parsing
                 url_parts = url.split(";")
                 server = url_parts[0].split(":")[0]
                 port = url_parts[0].split(":")[1]
                 database = url_parts[1].split("=")[1]
+                print('this is the url', url, server, port, database)
 
                 # Create the connection string
                 conn_str = f'DRIVER={{SQL Server}};SERVER={server},{port};DATABASE={database};Trusted_Connection=yes;'
@@ -72,15 +76,16 @@ def main():
                 # Close cursor and connection
                 cursor.close()
                 conn.close()
-
+                print(some_table)
                 mem_name = some_table[0][0]
                 dos = some_table[0][1]
                 proc_code = some_table[0][2]
                 proc_des = some_table[0][3]
+                print('line 79', mem_name, dos, proc_code, proc_des)
 
                 values_list = [mem_name, dos, proc_code, proc_des]
                 values_list = [str(i) for i in values_list] # ensure that they are string type and never None
-
+                print(values_list)
                 customer_keys = ['Member name', 'Date of Service', 'Procedure Code', 'Procedure Description'] # fixed case for parameters for now
                 mechanism_list = ["exact", "exact", "exact", "exact"] # how to treat each parameter
 
@@ -95,6 +100,7 @@ def main():
 
                 ### Read and collect all the data from the documents stored ###
                 list_meta_data, list_image_data, list_text_data = [], [], []
+                print('line 79', list_paths)
 
                 for file_count in range(len(list_paths)):
                 
