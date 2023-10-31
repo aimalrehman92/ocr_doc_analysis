@@ -138,7 +138,7 @@ class ProcessAttachments:
         #image_size = image_numpy.shape
         image_size = new_width, new_height
 
-        print("IMAGE SIZE and TYPE", image_size, type(image))
+        #print("IMAGE SIZE and TYPE", image_size, type(image))
         
         return temp_path, image_size
     
@@ -158,7 +158,7 @@ class ProcessAttachments:
         pdf = FPDF()
         
         for j in range(len(list_numpy_images)):
-            print(j)
+            #print(j)
             temp_path, img_size = self.save_temp_images(list_numpy_images[j], j)
             #w, h, c = img_size
             pdf.add_page()

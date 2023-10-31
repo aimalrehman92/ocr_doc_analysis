@@ -232,12 +232,14 @@ class ReturnImageData:
         no_of_pages = len(ocr_images)
         common_words =  self.split_and_repopulate_string_list(common_words)
 
-        print("These are values for the keys in the database")
-        print(common_words)
         margin = 6
         for ii in range(no_of_pages): # loop over the pages within a document
             ocr_image = ocr_images[ii]  # a page
+            #print(type(ocr_image), ocr_image.size)
+            #ocr_image = ocr_image.convert('L')
             ocr_image = np.array(ocr_image)
+            #ocr_image = cv2.cvtColor(ocr_image, cv2.COLOR_BGR2GRAY) #post_processing_unit
+            
             meta_data = ocr_meta_data[ocr_meta_data['page_num'] == ii+1].copy()
 
             for text in common_words:
@@ -246,7 +248,10 @@ class ReturnImageData:
                     useful_coord = meta_data.loc[meta_data['text'] == text, ['left', 'top', 'width', 'height']].reset_index(drop=True).values[0]
                     x, y, w, h = useful_coord[0], useful_coord[1], useful_coord[2], useful_coord[3]
                     sub_img = ocr_image[y-margin : y + h+margin, x-margin : x + w + margin]
-                    white_rect = np.ones(sub_img.shape, dtype=np.uint8) * 255
+                    #light_yellow = np.array([255, 255, 150], dtype=np.uint8)
+                    maroon = np.array([240, 130, 160], dtype=np.uint8)
+                    white_rect = np.ones(sub_img.shape, dtype=np.uint8) * maroon
+                    #print("white rect shape is like this:", white_rect.shape)
                     #res = cv2.addWeighted(sub_img, 0.2, white_rect, 0.5, 0)
                     res = cv2.addWeighted(sub_img, 0.2, white_rect, 0.5, 1)
                     ocr_image[y-margin : y + h+margin, x-margin : x + w+margin] = res
@@ -316,26 +321,9 @@ class ReturnImageData:
             page_text = document_meta_data[document_meta_data['page_num'] == page_num+1]['text'].tolist()
             page_text = " ".join(page_text)
 
-            #prints("--------------------------------------------")
-            #print(page_text)
-            #print("--------------------------------------------")
-            #page_text = document_text
-            #page_text = page.extract_text()
-
-            #document_meta_data[]
-
-            #print("----------------------------")
-            #print("What is text to mark anyway ?")
-            #print(text_to_mark)
-            #print("----------------------------")
-
             for i in range(len(text_to_mark)):
 
                 text_string = text_to_mark[i]
-
-                #print("----------------------------------")
-                #print(text_string)
-                #print("----------------------------------")
 
                 if text_string in page_text:
                     #print("Heading found!", page_num)
