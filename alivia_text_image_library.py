@@ -249,8 +249,8 @@ class ReturnImageData:
                     x, y, w, h = useful_coord[0], useful_coord[1], useful_coord[2], useful_coord[3]
                     sub_img = ocr_image[y-margin : y + h+margin, x-margin : x + w + margin]
                     #light_yellow = np.array([255, 255, 150], dtype=np.uint8)
-                    maroon = np.array([240, 130, 160], dtype=np.uint8)
-                    white_rect = np.ones(sub_img.shape, dtype=np.uint8) * maroon
+                    yellow = np.array([240, 130, 160], dtype=np.uint8)
+                    white_rect = np.ones(sub_img.shape, dtype=np.uint8) * yellow
                     #print("white rect shape is like this:", white_rect.shape)
                     #res = cv2.addWeighted(sub_img, 0.2, white_rect, 0.5, 0)
                     res = cv2.addWeighted(sub_img, 0.2, white_rect, 0.5, 1)

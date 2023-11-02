@@ -74,7 +74,7 @@ def main():
             
             values_list = [mem_name, dos, proc_code, proc_des]
             values_list = [str(i) for i in values_list] # ensure that they are string type and never None
-            customer_keys = ['Member name', 'Date of Service', 'Procedure Code', 'Procedure Description'] # fixed case for parameters for now
+            customer_keys = ['Member Name', 'DOS', 'Procedure Code', 'Procedure Description'] # fixed case for parameters for now
             mechanism_list = ["exact", "exact", "exact", "exact"] # how to treat each parameter
 
             print("The values extracted from the database")
@@ -154,7 +154,7 @@ def main():
                 #image_outline_path = f"{os.getcwd()}\\temp_folder\\output_outline_{file_count}.pdf"
                 #image_outline_path = f"C:\\Case_Files\\{prepay_claimID}\\output_outline_{file_count}.pdf"
                 
-                parent_path = 'C:\\Case_Files'
+                parent_path = 'E:\\CaseFiles'
                 final_path = parent_path + f"\\{str(prepay_claimID)}"
                 if not os.path.exists(final_path):
                     os.makedirs(final_path)
@@ -171,6 +171,7 @@ def main():
                 file_object["claimId"] = prepay_claimID
                 file_object["fileLocation"] = file_name
                 file_object["fileExtension"] = "PDF"
+                file_object["fileName"] = file_name
                 file_object["createdOn"] = datetime.today().strftime('%m/%d/%Y')
 
                 output_objects.append(file_object)
