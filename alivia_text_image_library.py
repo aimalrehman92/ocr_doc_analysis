@@ -243,17 +243,20 @@ class ReturnImageData:
             meta_data = ocr_meta_data[ocr_meta_data['page_num'] == ii+1].copy()
 
             for text in common_words:
+                meta_data['text'] = meta_data['text'].astype(str)
+                meta_data['text'] = meta_data['text'].str.replace('.', '')
+                
                 retrieved_info = meta_data.loc[meta_data['text'] == text, ['left', 'top', 'width', 'height']]
                 if len(retrieved_info) > 0:
                     useful_coord = meta_data.loc[meta_data['text'] == text, ['left', 'top', 'width', 'height']].reset_index(drop=True).values[0]
                     x, y, w, h = useful_coord[0], useful_coord[1], useful_coord[2], useful_coord[3]
                     sub_img = ocr_image[y-margin : y + h+margin, x-margin : x + w + margin]
-                    #light_yellow = np.array([255, 255, 150], dtype=np.uint8)
-                    yellow = np.array([240, 130, 160], dtype=np.uint8)
-                    white_rect = np.ones(sub_img.shape, dtype=np.uint8) * yellow
+                    light_yellow = np.array([255, 255, 120], dtype=np.uint8)
+                    #maroon = np.array([240, 130, 160], dtype=np.uint8)
+                    white_rect = np.ones(sub_img.shape, dtype=np.uint8) * light_yellow
                     #print("white rect shape is like this:", white_rect.shape)
                     #res = cv2.addWeighted(sub_img, 0.2, white_rect, 0.5, 0)
-                    res = cv2.addWeighted(sub_img, 0.2, white_rect, 0.5, 1)
+                    res = cv2.addWeighted(sub_img, 0.6, white_rect, 0.3, 1)
                     ocr_image[y-margin : y + h+margin, x-margin : x + w+margin] = res
                     #cv2.rectangle(ocr_image, (x-margin, y-margin), (x + w+margin, y + h+margin), (0, 0, 255), 2)
                     

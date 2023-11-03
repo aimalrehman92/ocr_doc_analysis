@@ -57,7 +57,7 @@ def main():
             tableName = req_json["tableName"]
             prepay_claimID = req_json["prepayClaimID"]
             
-            query = f"SELECT MemberName, ServiceToDate, ProcedureCode, ProcedureDescription FROM {tableName} WHERE claimSeq = {claimSeq};" # hardcode
+            query = f"SELECT MemberName, ServiceFromDate, ProcedureCode, ProcedureDescription FROM {tableName} WHERE claimSeq = {claimSeq};" # hardcode
             cursor.execute(query)
             some_table = cursor.fetchall()
             some_table = pd.DataFrame(some_table)
@@ -74,6 +74,10 @@ def main():
             
             values_list = [mem_name, dos, proc_code, proc_des]
             values_list = [str(i) for i in values_list] # ensure that they are string type and never None
+            
+            print("All values:")
+            print(values_list)
+            
             customer_keys = ['Member Name', 'DOS', 'Procedure Code', 'Procedure Description'] # fixed case for parameters for now
             mechanism_list = ["exact", "exact", "exact", "exact"] # how to treat each parameter
 
@@ -170,8 +174,8 @@ def main():
                 file_object = {}
                 file_object["claimId"] = prepay_claimID
                 file_object["fileLocation"] = file_name
-                file_object["fileExtension"] = "PDF"
                 file_object["fileName"] = file_name
+                file_object["fileExtension"] = "PDF"
                 file_object["createdOn"] = datetime.today().strftime('%m/%d/%Y')
 
                 output_objects.append(file_object)
