@@ -143,17 +143,22 @@ class ProcessAttachments:
         return temp_path, image_size
     
 
-    def images_to_pdf(self, list_numpy_images, index):
+    def images_to_pdf(self, list_numpy_images, index, filepath):
 
         # This will convert an image or a group of images per attachment to a single PDF in local and return path
         
         temp_dir = os.getcwd() + "/temp_folder/"
-        
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
         
-        output_pdf_path = temp_dir + f"output_{index}.pdf"
-        
+        #output_pdf_path = temp_dir + f"output_{index}.pdf"
+        #splitter = self.split_directory_filename()
+        #directory, filename = splitter(filepath)
+        directory, filename = self.split_directory_filename(filepath)
+        filename = filename + '_highlight.pdf'
+
+        output_pdf_path = directory + '\\' + filename
+
         pythoncom.CoInitialize()
         pdf = FPDF()
         
@@ -170,10 +175,26 @@ class ProcessAttachments:
         del(pdf)
 
         # To be used by the service outside
-        temp_dir = os.getcwd() + "\\temp_folder\\"
-        output_pdf_path = temp_dir + f"output_{index}.pdf"
+        #temp_dir = os.getcwd() + "\\temp_folder\\"
+        #output_pdf_path = temp_dir + f"output_{index}.pdf"
 
         return output_pdf_path
+    
+    
+    def split_directory_filename(self, my_string):
+        
+        last_index = my_string.rfind('\\')
+
+        if last_index != -1:
+            # Extract the substring before the last comma
+            directory_info = my_string[:last_index]
+            file_name = my_string[last_index + 1:]
+            
+        else:
+            pass # case handle this issue
+    
+        return directory_info, file_name
+            
 
 
 class HandleErrorLogs:
