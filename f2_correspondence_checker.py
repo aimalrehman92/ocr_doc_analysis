@@ -56,8 +56,19 @@ def main():
             claimSeq = req_json["claimSeq"]
             tableName = req_json["tableName"]
             prepay_claimID = req_json["prepayClaimID"]
+
+
+            if "parameters" in req_json:
+                cols = req_json["parameters"]
+
+            else:
+                cols = ['Member Name', 'DOS', 'Procedure Code', 'Procedure Description']
             
-            query = f"SELECT MemberName, ServiceFromDate, ProcedureCode, ProcedureDescription FROM {tableName} WHERE claimSeq = {claimSeq};" # hardcode
+            
+            cols_string = ', '.join(cols) # Member Name, DOS, Procedure Code, Procedure Description
+
+            
+            query = f"SELECT {cols_string} FROM {tableName} WHERE claimSeq = {claimSeq};" # hardcode
             cursor.execute(query)
             some_table = cursor.fetchall()
             some_table = pd.DataFrame(some_table)
@@ -78,7 +89,8 @@ def main():
             print("All values:")
             print(values_list)
             
-            customer_keys = ['Member Name', 'DOS', 'Procedure Code', 'Procedure Description'] # fixed case for parameters for now
+            #customer_keys = ['Member Name', 'DOS', 'Procedure Code', 'Procedure Description'] # fixed case for parameters for now
+            customer_keys = cols
             mechanism_list = ["exact", "exact", "exact", "exact"] # how to treat each parameter
 
             print("The values extracted from the database")
@@ -152,14 +164,18 @@ def main():
 
                 file_with_highlights = proc_attach.images_to_pdf(list_image_data[file_count], 0)
    
-                
                 text_to_mark = values_found
                 
                 #image_outline_path = f"{os.getcwd()}\\temp_folder\\output_outline_{file_count}.pdf"
                 #image_outline_path = f"C:\\Case_Files\\{prepay_claimID}\\output_outline_{file_count}.pdf"
-                
-                parent_path = 'E:\\CaseFiles'
-                final_path = parent_path + f"\\{str(prepay_claimID)}"
+
+                #parent_path = 'E:\\CaseFiles'
+                #final_path = parent_path + f"\\{str(prepay_claimID)}" # these two lines work but hardcoded
+
+                prepay_claimID = str(prepay_claimID)
+                parent_path = list_paths[0].split('\\')[:2]
+                final_path = f"{parent_path}\\{prepay_claimID}"
+
                 if not os.path.exists(final_path):
                     os.makedirs(final_path)
                 file_name = f"output_outline_{file_count}.pdf"
