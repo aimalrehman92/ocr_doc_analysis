@@ -162,7 +162,7 @@ def main():
 
                 list_image_data[file_count] = return_image.highlight_text_on_image(list_meta_data[file_count], values_found, list_image_data[file_count], 1)
 
-                file_with_highlights = proc_attach.images_to_pdf(list_image_data[file_count], 0)
+                file_with_highlights = proc_attach.images_to_pdf(list_image_data[file_count], 0, list_paths[file_count])
    
                 text_to_mark = values_found
                 
@@ -174,10 +174,13 @@ def main():
 
                 prepay_claimID = str(prepay_claimID)
                 parent_path = list_paths[0].split('\\')[:2]
+                parent_path = '\\'.join(parent_path)
+
                 final_path = f"{parent_path}\\{prepay_claimID}"
 
                 if not os.path.exists(final_path):
                     os.makedirs(final_path)
+                
                 file_name = f"output_outline_{file_count}.pdf"
                 image_outline_path = f"{final_path}\\{file_name}"
 
