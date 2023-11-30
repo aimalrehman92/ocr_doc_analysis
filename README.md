@@ -54,7 +54,7 @@ If a different path is chosen, please note it down and paste it in the script "a
 
 - Assuming that the environment is still activate, now run the Flask app on terminal by running any of the two, as desired:
     - flask --app f1_plagiarism_calc.py run --host=0.0.0.0 --port=5000
-    - flask --app f2_correpondance_checker.py run --host=0.0.0.0 --port=5020
+    - flask --app f2_correspondence_checker.py run --host=0.0.0.0 --port=5020
 
     The first command is for plagiarism calculation application. The second comand is for correspondance checker in prepay.
 &nbsp;
@@ -82,54 +82,6 @@ The Plagiarism Calculation Python application can run plagiarism report by recei
 ['.txt', '.docx']
 
 - For images, it can extract text from the following formats:
-['.jpeg', '.jpg', '.png', 'pdf', '.tiff', '.tif'],
+['.jpeg', '.jpg', '.png', 'pdf'],
 
 Output report consist of 'Primary Output' and Secondary Output'. The Primary Output shows highest similarity and the corresponding document, for each uploaded document. The Secondary Output displays similarity matrix containing percentage similarity for all possible pairs of the documents uploaded.
-
-#### Example Input Backend service
-
-{
-"1" : "Data_for_SimilarityDetection/Data_for_demo/Fausto_Alber_1.jpg",
-"2" : "Data_for_SimilarityDetection/Urgent_Medical_Record.png",
-"3" : "Data_for_SimilarityDetection/George_Lawrence_printed.docx"
-}
-
-#### Corresponding Output
-
-{
-    "primary_output": [
-        [
-            "Attach_1",
-            "Attach_3",
-            90.91
-        ],
-        [
-            "Attach_2",
-            "Attach_3",
-            57.59
-        ],
-        [
-            "Attach_3",
-            "Attach_1",
-            90.91
-        ]
-    ],
-    "secondary_output": {
-        "Attach_1": [
-            100.0,
-            57.58,
-            90.91
-        ],
-        "Attach_2": [
-            57.58,
-            100.0,
-            57.59
-        ],
-        "Attach_3": [
-            90.91,
-            57.59,
-            100.0
-        ]
-    }
-}
-
