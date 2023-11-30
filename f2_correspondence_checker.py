@@ -181,7 +181,7 @@ def main():
                 if not os.path.exists(final_path):
                     os.makedirs(final_path)
                 
-                file_name = f"output_outline_{file_count}.pdf"
+                file_name = f"{claimSeq}_output_outline_{file_count}.pdf"
                 image_outline_path = f"{final_path}\\{file_name}"
 
                 return_image.create_outline(file_with_highlights, text, meta, text_to_mark, keys_found, image_outline_path)
