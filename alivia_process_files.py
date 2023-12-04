@@ -74,11 +74,35 @@ class ProcessAttachments:
         pdf.add_page()
     
         # Convert each paragraph in DOCX to a PDF page
+        #for para in doc.paragraphs:
+        #    encoded_text = para.text.encode('latin-1', 'replace').decode('latin-1')
+        #    pdf.set_font("Arial", size=11)
+        #    pdf.multi_cell(0, 10, encoded_text)
+        #    pdf.ln()
+
+        encodings_to_try = ['latin-1', 'utf-8', 'utf-16', 'utf-32', 'windows-1252'] # their sequence is alsoe important. we might not need all.
+
         for para in doc.paragraphs:
-            encoded_text = para.text.encode('latin-1', 'replace').decode('latin-1')
+            text = para.text
+        
+            # Handling encoding issues by attempting different encodings
+            for encoding in encodings_to_try:
+                try:
+                    text = text.encode(encoding, 'ignore').decode(encoding)
+                    break
+                except UnicodeEncodeError:
+                    pass
+        
+            # Handling special characters by replacing them
+            text = text.replace('\u2022', '-')  # Example: Replace bullet points with hyphens
+        
+            # Adding text to PDF
             pdf.set_font("Arial", size=11)
-            pdf.multi_cell(0, 10, encoded_text)
+            pdf.multi_cell(0, 10, text)
             pdf.ln()
+
+
+
     
         # Output the PDF to the specified file
         pdf.output(output_file)
