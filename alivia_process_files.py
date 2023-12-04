@@ -9,6 +9,8 @@ import os
 from PIL import Image,ImageFilter
 import logging
 import pythoncom
+from docx import Document
+
 ############################################# Process attachments #############################################
 
 class ProcessAttachments:
@@ -62,7 +64,24 @@ class ProcessAttachments:
         return (list_table_types, list_image_types, list_text_types), (index_table_types, index_image_types, index_text_types)
     
 
+    def only_docx_to_pdf(self, input_file, output_file):
     
+        doc = Document(input_file)
+    
+        # Initialize the PDF object
+        pdf = FPDF()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.add_page()
+    
+        # Convert each paragraph in DOCX to a PDF page
+        for para in doc.paragraphs:
+            pdf.set_font("Arial", size=11)
+            pdf.multi_cell(0, 10, para.text)
+            pdf.ln()
+    
+        # Output the PDF to the specified file
+        pdf.output(output_file)
+
 
 
     def txt_docs_to_pdf(self, input_file, index):
@@ -103,8 +122,9 @@ class ProcessAttachments:
         
 
         elif Path(input_file).suffix == '.docx':
-            pythoncom.CoInitialize()
-            convert(input_file, output_file)
+            #pythoncom.CoInitialize()
+            #convert(input_file, output_file)
+            self.only_docx_to_pdf(input_file, output_file)
             
         else:
             pass #handle this very nicely!
