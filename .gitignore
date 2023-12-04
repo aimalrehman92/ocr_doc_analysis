@@ -3,3 +3,7 @@ Scripts
 Include
 __pycache__
 pyvenv.cfg
+etc
+logs
+share
+temp_folder
