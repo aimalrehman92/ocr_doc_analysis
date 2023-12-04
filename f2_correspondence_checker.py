@@ -63,7 +63,7 @@ def main():
 
             else:
                 cols = ['Member Name', 'DOS', 'Procedure Code', 'Procedure Description']
-            
+        
             
             cols_string = ', '.join(cols) # Member Name, DOS, Procedure Code, Procedure Description
 

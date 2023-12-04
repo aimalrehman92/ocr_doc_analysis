@@ -62,6 +62,9 @@ class ProcessAttachments:
         return (list_table_types, list_image_types, list_text_types), (index_table_types, index_image_types, index_text_types)
     
 
+    
+
+
     def txt_docs_to_pdf(self, input_file, index):
 
         # Converts a text file or a word document file to PDF to local memory
