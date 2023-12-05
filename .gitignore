@@ -7,3 +7,5 @@ etc
 logs
 share
 temp_folder
+app/logs
+app/src/temp_folder
