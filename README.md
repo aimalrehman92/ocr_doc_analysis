@@ -10,29 +10,23 @@ Correspondance Checker checks whether the medical records uploaded by the servic
 ## How to deploy it on your system from scratch?
 
 - Set up Python 3.9.13 on the system you want to run this set of applications on
-
 &nbsp;
 - Git clone this repository in a directory (for example: alivia-ocr)
-
 &nbsp;
 - Navigate to that parent directory of "alivia-ocr" created in the previous step and create Python virtual environment with the following command:
     - python -m venv alivia-ocr
-
 &nbsp;
 - Navigate inside "alivia-ocr" and activate the environment by running the command:
     - Scripts\Activate
-
 &nbsp;
 - Install the dependencies using the commnad:
     - pip install requirements.txt
-
 &nbsp;
 - Next, install Tesseract-OCR 5.3.1.20230401 or 5.3.3.20231005 from the link: https://github.com/UB-Mannheim/tesseract/wiki
 It is recommended to install it in the following path:
 "C:\Program Files\Tesseract-OCR\"
 (It will ask for path during installation.Don't worry!)
 &nbsp;
-
 - Assuming that the environment is still activate, now run one of the two Flask apps on terminal with commands:
     - flask --app f1_plagiarism_calc.py run --host=0.0.0.0 --port=5000
     - flask --app f2_correspondence_checker.py run --host=0.0.0.0 --port=5020
@@ -40,7 +34,6 @@ It is recommended to install it in the following path:
     The first command is for "Plagiarism Calculator" and the second command is for "Correspondence Checker" application.
     To run both, you have to open two terminals.
 &nbsp;
-
 - Remember that plagiarism report can be viewed at http://127.0.0.1:5000/plagiarism_calculation/
 - Also, remember that correspondance check can be viewed at http://127.0.0.1:5020//prepay_correspondance_check/
 
