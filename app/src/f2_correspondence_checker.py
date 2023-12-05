@@ -1,10 +1,10 @@
 
 
-from app.src.modules.alivia_text_image_library import ExtractImageText, ExtractDocumentText, ReturnImageData
+from app.src.modules.alivia_text_image_library import ExtractImageText, ReturnImageData
 from app.src.modules.alivia_process_files import ProcessAttachments, HandleErrorLogs
 from app.src.modules.alivia_stats_library import PlagiarismCalculation
 
-from flask import Flask, request, jsonify
+from flask import request, jsonify
 
 import pandas as pd
 import pyodbc
@@ -12,7 +12,6 @@ import numpy as np
 import os
 from datetime import datetime
 
-#app = Flask(__name__)
 from app.src.f1_plagiarism_calc import app
 app.json.sort_keys = False
 
