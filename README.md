@@ -27,23 +27,17 @@ It is recommended to install it in the following path:
 "C:\Program Files\Tesseract-OCR\"
 (It will ask for path during installation.Don't worry!)
 &nbsp;
-- Assuming that the environment is still activate, now run one of the two Flask apps on terminal with commands:
-    - flask --app f1_plagiarism_calc.py run --host=0.0.0.0 --port=5000
-    - flask --app f2_correspondence_checker.py run --host=0.0.0.0 --port=5020
-
-    The first command is for "Plagiarism Calculator" and the second command is for "Correspondence Checker" application.
-    To run both, you have to open two terminals.
+- Assuming that the environment is still activate, now run the following command:
+    - flask --app app\main.py run --host=0.0.0.0 --port=5020
 &nbsp;
-- Remember that plagiarism report can be viewed at http://127.0.0.1:5000/plagiarism_calculation/
-- Also, remember that correspondance check can be viewed at http://127.0.0.1:5020//prepay_correspondance_check/
+- Remember that plagiarism report can be viewed at http://127.0.0.1:5020/plagiarism_calculation/
+- Remember that correspondence check can be viewed at http://127.0.0.1:5020//prepay_correspondance_check/
 
 ## How to run deployed service manually?
 
 - Open terminal and navigate to the directory of this code ("alivia-ocr")
 - Type the command: Scripts\Activate (This will activate the environment)
-- Now, type the command: flask --app f1_plagiarism_calc.py run --host=0.0.0.0 --port=5000 (to run the plagiarism calculator) \
-OR
-- Type the command: flask --app f2_correspondence_checker.py run --host=0.0.0.0 --port=5020 (to run the correspondence checker)
+- Now, type the command: flask --app app\main.py run --host=0.0.0.0 --port=5020 
 
 ## Brief description about the functionalities
 
