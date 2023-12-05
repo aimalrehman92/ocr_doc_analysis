@@ -4,6 +4,7 @@ from app.src.f1_plagiarism_calc import main_percentage
 from app.src.f1_plagiarism_calc import main_text_return
 
 from app.src.f2_correspondence_checker import main_correspondence
+from app.src.f3_AI_polish_calc import main_AI_polish_calculator
 
 #@app.route('/', methods=['GET', 'POST'])
 def main():
@@ -16,6 +17,9 @@ def main():
 
         # F2 correspondence checker
         result = main_correspondence()
+        
+        # F3 ai detector
+        result = main_AI_polish_calculator()
 
         print(result)
 
