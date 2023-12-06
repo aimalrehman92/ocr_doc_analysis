@@ -111,7 +111,7 @@ class ProcessAttachments:
 
         # Converts a text file or a word document file to PDF to local memory
          
-        temp_dir = os.getcwd() + "/app/temp_folder/"
+        temp_dir = os.getcwd() + "\\app\\temp_folder\\"
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
 
@@ -159,7 +159,7 @@ class ProcessAttachments:
         
         # This function will save image in the local memory for temporary use
         
-        temp_dir = os.getcwd() + "/app/temp_folder/"
+        temp_dir = os.getcwd() + "\\app\\temp_folder\\"
 
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
@@ -193,7 +193,7 @@ class ProcessAttachments:
 
         # This will convert an image or a group of images per attachment to a single PDF in local and return path
         
-        temp_dir = os.getcwd() + "/app/temp_folder/"
+        temp_dir = os.getcwd() + "\\app\\temp_folder\\"
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
         
@@ -250,7 +250,7 @@ class HandleErrorLogs:
 
     def log_error(self, log_filename, message):
 
-        temp_dir = os.getcwd() + "/app/logs/"
+        temp_dir = os.getcwd() + "\\app\\logs\\"
 
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)

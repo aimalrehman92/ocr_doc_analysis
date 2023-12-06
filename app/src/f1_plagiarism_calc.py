@@ -120,6 +120,8 @@ def main_text_return():
                     list_paths.append(req_json[str(i)])
             
                 list_paths = [path_ for path_ in list_paths if path_ is not None] # None cleaning
+
+                list_paths_original = list_paths.copy()
                 
                 list_meta_data, list_image_data, list_text_data = [], [], []
 
@@ -160,7 +162,7 @@ def main_text_return():
                     
                     for i in range(attachments_len):
                         print(list_paths[i])
-                        output_paths.append(proc_attach.images_to_pdf(list_image_data[i], i, list_paths[i]))
+                        output_paths.append(proc_attach.images_to_pdf(list_image_data[i], i, list_paths_original[i]))
 
                 output = {"1": output_paths[0], "2":output_paths[1]}
 
