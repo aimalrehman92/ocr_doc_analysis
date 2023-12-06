@@ -161,7 +161,7 @@ def main_text_return():
                     output_paths = []
                     
                     for i in range(attachments_len):
-                        print(list_paths[i])
+                        print(list_paths_original[i])
                         output_paths.append(proc_attach.images_to_pdf(list_image_data[i], i, list_paths_original[i]))
 
                 output = {"1": output_paths[0], "2":output_paths[1]}
