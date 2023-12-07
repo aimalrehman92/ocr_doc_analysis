@@ -1,6 +1,5 @@
 
 # This library contains several file handling functionalities:
-# for example, detecting and changing file format or type and saving files on the local, etc
 
 from pathlib import Path
 from fpdf import FPDF
@@ -242,7 +241,6 @@ class ProcessAttachments:
         return directory_info, file_name
             
 
-
 class HandleErrorLogs:
 
     def __init__(self):
@@ -260,7 +258,7 @@ class HandleErrorLogs:
         logging.basicConfig(filename=log_filepath, filemode='a', format='%(asctime)s - %(message)s', level=logging.ERROR)
         
         with open(log_filepath, "a+") as myfile:
-            myfile.write("\n ********************** \n")
+            myfile.write("\n ****************************************************************** \n")
             myfile.write(f'ERROR : {message} \n')
         myfile.close()
 

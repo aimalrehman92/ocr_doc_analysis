@@ -80,10 +80,6 @@ class ExtractImageText(ExtractTextAndProcess):
     def __init__(self):
         
         self.path_tesseract = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-        #self.poppler_path = r'C:\Program Files\poppler-23.08.0\Library\bin'
-
-        #self.path_tesseract = os.getcwd() + r'\Tesseract-OCR\tesseract-5.3.1\tesseract.exe'
-        #self.poppler_path = os.getcwd() + r'\poppler-23.08.0\Library\bin'
         self.poppler_path = os.getcwd() + r'\app\src\modules\poppler-23.08.0\Library\bin'
 
 
@@ -356,9 +352,7 @@ class ReturnImageData:
             page_text = page.extract_text()
 
             for heading in headings_to_mark:
-                #print("///////////////")
-                #print(heading)
-                #print(page_text) # THIS IS THE ISSUE AIMAL !!! RESOLVE IT BY REMOVING THIS PART AND USING THE LIST_TEXT_DATA FROM THE MAIN FILE
+                
                 if heading in page_text:
                     #print("Heading Found!")
                     #bookmark = pdf_writer.addBookmark(heading, page_num)
@@ -371,22 +365,3 @@ class ReturnImageData:
         
         return None
         
-        
-
-if __name__ == '__main__':
-    
-    list_paths = [
-    "C:\\Users\\MuhammadAimalRehman\\Documents\\OCR_Project\\PyTesseract_Demo_01\\pytesser_demo\\Data_for_SimilarityDetection\\OCR_Tahira\\Pres 1.jpg",
-    "C:\\Users\\MuhammadAimalRehman\\Documents\\OCR_Project\\PyTesseract_Demo_01\\pytesser_demo\\Data_for_SimilarityDetection\\OCR_Tahira\\Pres 2.jpg",
-    "C:\\Users\\MuhammadAimalRehman\\Documents\\OCR_Project\\PyTesseract_Demo_01\\pytesser_demo\\Data_for_SimilarityDetection\\OCR_Tahira\\Prescription 1.jpg"
-    ]
-
-    extract_from_image = ExtractImageText()
-
-    t0 = datetime.now()
-    list_texts = extract_from_image.extract_text(list_paths)
-    print("time taken: ", datetime.now()-t0)
-
-    print("Length:", len(list_texts))
-    print(list_texts)
-
