@@ -45,14 +45,16 @@ def main_correspondence(req_json):
 
         if "parameters" in req_json:
             cols = req_json["parameters"]
+            customer_keys = cols
 
         else:
-            cols = ['Member Name', 'DOS', 'Procedure Code', 'Procedure Description']
-        
-            
+            cols = ['MemberName', 'ServiceFromDate', 'ProcedureCode', 'ProcedureDescription']
+            customer_keys = ['Member Name', 'DOS', 'Procedure Code', 'Procedure Description']
+
+
         cols_string = ', '.join(cols) # Member Name, DOS, Procedure Code, Procedure Description
 
-            
+    
         query = f"SELECT {cols_string} FROM {tableName} WHERE claimSeq = {claimSeq};" # hardcode
         cursor.execute(query)
         some_table = cursor.fetchall()
@@ -72,7 +74,7 @@ def main_correspondence(req_json):
         values_list = [str(i) for i in values_list] # ensure that they are string type and never None
             
         #customer_keys = ['Member Name', 'DOS', 'Procedure Code', 'Procedure Description'] # fixed case for parameters for now
-        customer_keys = cols
+        #customer_keys = cols
         mechanism_list = ["exact", "exact", "exact", "exact"] # how to treat each parameter
 
         ### Making objects for the relevant classes in the script ###

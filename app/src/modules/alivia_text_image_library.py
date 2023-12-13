@@ -238,18 +238,12 @@ class ReturnImageData:
         margin = 6
         for ii in range(no_of_pages): # loop over the pages within a document
             ocr_image = ocr_images[ii]  # a page
-            #print(type(ocr_image), ocr_image.size)
-            #ocr_image = ocr_image.convert('L')
+            
             ocr_image = np.array(ocr_image)
-            #ocr_image = cv2.cvtColor(ocr_image, cv2.COLOR_BGR2GRAY) #post_processing_unit
             
             meta_data = ocr_meta_data[ocr_meta_data['page_num'] == ii+1].copy()
 
             meta_data = meta_data[meta_data['text'].isin(common_words)]
-
-            #print("*******************")
-            #print(meta_data.head(15))
-            #print("*******************")
 
             meta_data['right'] = meta_data['left'] + meta_data['width']
             meta_data['bottom'] = meta_data['top'] + meta_data['height']
