@@ -74,10 +74,10 @@ class ProcessAttachments:
     
         # Convert each paragraph in DOCX to a PDF page
         #for para in doc.paragraphs:
-        #    encoded_text = para.text.encode('latin-1', 'replace').decode('latin-1')
-        #    pdf.set_font("Arial", size=11)
-        #    pdf.multi_cell(0, 10, encoded_text)
-        #    pdf.ln()
+        # encoded_text = para.text.encode('latin-1', 'replace').decode('latin-1')
+        # pdf.set_font("Arial", size=11)
+        # pdf.multi_cell(0, 10, encoded_text)
+        # pdf.ln()
 
         encodings_to_try = ['latin-1', 'utf-8', 'utf-16', 'utf-32', 'windows-1252'] # their sequence is alsoe important. we might not need all.
 

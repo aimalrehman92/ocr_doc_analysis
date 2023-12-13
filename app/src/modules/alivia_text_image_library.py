@@ -24,6 +24,8 @@ from pdf2image import convert_from_path
 from datetime import datetime
 import PyPDF2
 
+pd.options.mode.chained_assignment = None  # or 'warn'
+
 ############################################# Classes on text extraction and text processing #############################################
 
 class ExtractTextAndProcess:
@@ -229,6 +231,10 @@ class ReturnImageData:
         no_of_pages = len(ocr_images)
         common_words =  self.split_and_repopulate_string_list(common_words)
 
+        #print("******************************************")
+        #print(common_words)
+        #print("******************************************")
+
         margin = 6
         for ii in range(no_of_pages): # loop over the pages within a document
             ocr_image = ocr_images[ii]  # a page
@@ -239,16 +245,86 @@ class ReturnImageData:
             
             meta_data = ocr_meta_data[ocr_meta_data['page_num'] == ii+1].copy()
 
+            meta_data = meta_data[meta_data['text'].isin(common_words)]
+
+            #print("*******************")
+            #print(meta_data.head(15))
+            #print("*******************")
+
+            meta_data['right'] = meta_data['left'] + meta_data['width']
+            meta_data['bottom'] = meta_data['top'] + meta_data['height']
+
+            df_sample = meta_data[['text', 'page_num', 'block_num', 'par_num', 'line_num', 'word_num', 'left', 'top', 'right', 'bottom']].copy()
+
+            df_sample['delta_page_num'] = df_sample['page_num'] - df_sample['page_num'].shift(+1)
+            df_sample['delta_block_num'] = df_sample['block_num'] - df_sample['block_num'].shift(+1)
+            df_sample['delta_par_num'] = df_sample['par_num'] - df_sample['par_num'].shift(+1)
+            df_sample['delta_line_num'] = df_sample['line_num'] - df_sample['line_num'].shift(+1)
+            df_sample['delta_word_num'] = df_sample['word_num'] - df_sample['word_num'].shift(+1)
+
+            df_sample['delta_page_num'] = df_sample['delta_page_num'].fillna(0.0)
+            df_sample['delta_block_num'] = df_sample['delta_block_num'].fillna(0.0)
+            df_sample['delta_par_num'] = df_sample['delta_par_num'].fillna(0.0)
+            df_sample['delta_line_num'] = df_sample['delta_line_num'].fillna(0.0)
+            df_sample['delta_word_num'] = df_sample['delta_word_num'].fillna(1.0)
+
+            blob = 1
+            df_sample['blob'] = blob
+
+            for k in range(len(df_sample)):
+                if k > 0:
+                    if df_sample['delta_word_num'].iloc[k] != 1:
+                        blob += 1
+        
+                df_sample['blob'].iloc[k] = blob
+
+
+            #print(df_sample.head(20))
+            
+            df_toy_1 = df_sample[(df_sample['delta_page_num']==0)].groupby(['page_num', 'block_num', 'par_num', 'line_num', 'blob'])['left'].min()
+            df_toy_1 = df_toy_1.rename('left')
+
+            df_toy_2 = df_sample[(df_sample['delta_page_num']==0)].groupby(['page_num', 'block_num', 'par_num', 'line_num', 'blob'])['right'].max()
+            df_toy_2 = df_toy_2.rename('right')
+
+            df_toy_3 = df_sample[(df_sample['delta_page_num']==0)].groupby(['page_num', 'block_num', 'par_num', 'line_num', 'blob'])['top'].min()
+            df_toy_3 = df_toy_3.rename('top')
+
+            df_toy_4 = df_sample[(df_sample['delta_page_num']==0)].groupby(['page_num', 'block_num', 'par_num', 'line_num', 'blob'])['bottom'].max()
+            df_toy_4 = df_toy_4.rename('bottom')
+
+            df_toy = pd.concat([df_toy_1, df_toy_2, df_toy_3, df_toy_4], axis=1)
+            del(df_toy_1, df_toy_2, df_toy_3, df_toy_4)
+
+            for _, row in df_toy.iterrows():
+                
+                left, top, right, bottom = row[['left', 'top', 'right', 'bottom']].values
+
+                #print(left, top, right, bottom)
+
+                sub_img = ocr_image[top : bottom, left : right]
+
+                light_yellow = np.array([255, 225, 20], dtype=np.uint8)
+                white_rect = np.ones(sub_img.shape, dtype=np.uint8)*light_yellow
+
+                res = cv2.addWeighted(sub_img, 0.8, white_rect, 0.2, 1)
+                ocr_image[top : bottom, left : right] = res
+
+
+            '''
             for text in common_words:
                 meta_data['text'] = meta_data['text'].astype(str)
                 meta_data['text'] = meta_data['text'].str.replace('.', '')
                 
                 retrieved_info = meta_data.loc[meta_data['text'] == text, ['left', 'top', 'width', 'height']]
+
                 if len(retrieved_info) > 0:
                     useful_coord = meta_data.loc[meta_data['text'] == text, ['left', 'top', 'width', 'height']].reset_index(drop=True).values[0]
                     x, y, w, h = useful_coord[0], useful_coord[1], useful_coord[2], useful_coord[3]
                     sub_img = ocr_image[y-margin : y + h+margin, x-margin : x + w + margin]
+
                     light_yellow = np.array([255, 255, 120], dtype=np.uint8)
+                    
                     #maroon = np.array([240, 130, 160], dtype=np.uint8)
                     white_rect = np.ones(sub_img.shape, dtype=np.uint8) * light_yellow
                     #print("white rect shape is like this:", white_rect.shape)
@@ -262,14 +338,13 @@ class ReturnImageData:
                     #ocr_image = cv2.addWeighted(ocr_image, 1, mask, 0.4, 0) # bunch of post_processing lines
 
                     #ocr_image = cv2.convertScaleAbs(ocr_image, alpha=1, beta=-5) # part of pos_processing
+                
+            '''
             
-            #ocr_image = cv2.resize(ocr_image, (700, 900))
             ocr_image = cv2.resize(ocr_image, (2480, 3508)) # A4 resolution
 
             ocr_images[ii] = ocr_image        
-        # store the PDF or IMAGE file and return its path
-        #image_path = f"plagiarised_img_{img_num}.pdf"
-        #cv2.imwrite(image_path, ocr_images)
+
         return ocr_images
     
     

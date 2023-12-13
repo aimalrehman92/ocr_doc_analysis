@@ -108,7 +108,7 @@ def main_text_return(req_json):
                 text = extract_from_image.process_single_string(text) # if string cleaning + conversion to list of words
 
                 meta, page_images = extract_from_image.extract_text_with_coordinates(path)
-                meta = meta[meta['conf'] > 0]
+                #meta = meta[meta['conf'] > 0]
                     
                 list_text_data.append(text)
                 list_meta_data.append(meta) 
