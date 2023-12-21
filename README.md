@@ -1,11 +1,15 @@
-# Optical Character Recognition based Plagiarism Detection Module (Demo)
+# Optical Character Recognition Alivia - Intelligent Document Processing Applications
 
-This repository contains two OCR based services:
+This repository contains 3 OCR based services:
 1. OCR based Plagiarism Calculator
-2. OCR based Correspondance Checker
+2. OCR based Correspondence Checker
+3. OCR based AI-Involvement Checker
 
-Plagiarism Calculator is python service that runs plagiarism analysis and generates report on the uploaded images and/or text documents. They are expected to be medical records. The goal is to find which medical records are highly plagiarised and hence identify fake or forged records that lead to fraud, waste and abuse of healthcare insurance claims. If an uploaded document is an image, it extracts text using deep learning based optical character recognition technique. If it is a text file, the text content is extracted using basic Python functionality. This application also has the facility to return the plagiarised text highlighted over the documents in pair \
-Correspondance Checker checks whether the medical records uploaded by the service provider against a particular claim in a case correspond to that claim or not? For now, it only retrieves the information on member name, date of service, procedure code and procedure description from the uploaded documents and checks (exactly) if it matches with the informatino in that claim in the claims table inside the database.
+Alivia-OCR-application is a python service that runs several services: \
+ 1) Plagiarism Calculator: that runs similarity analysis on documents and images and generates report on the uploaded items. They are expected to be medical records. The goal is to find which medical records are highly plagiarised and hence identify fake or forged records that lead to fraud, waste and abuse of healthcare insurance claims. If an uploaded document is an image, it extracts text using deep learning based optical character recognition technique. If it is a text file, the text content is extracted using basic Python functionality. This application also has the facility to return the plagiarised text highlighted over the documents in pair. \
+ 2) Correspondance Checker checks whether the medical records uploaded by the service provider against a particular claim in a case correspond to that claim or not? For now, it only retrieves the information on member name, date of service, procedure code and procedure description from the uploaded documents and checks (exactly) if it matches with the informatino in that claim in the claims table inside the database.
+ 3) AI-Involvement Checker checks how much text content in a document (expected to be a medical record) has AI involvement in a sense that it is generated or refined by AI models like ChatGPT.
+
 
 ## How to deploy it on your system from scratch?
 
