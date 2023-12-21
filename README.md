@@ -36,6 +36,7 @@ It is recommended to install it in the following path:
 &nbsp;
 - Remember that plagiarism report can be viewed at http://127.0.0.1:5020/plagiarism_calculation/
 - Remember that correspondence check can be viewed at http://127.0.0.1:5020//prepay_correspondance_check/
+Remember that correspondence check can be viewed at http://127.0.0.1:5020/ai_polish_calculator/
 
 ## How to run deployed service manually?
 
@@ -43,12 +44,12 @@ It is recommended to install it in the following path:
 - Type the command: Scripts\Activate (This will activate the environment)
 - Now, type the command: flask --app app\main.py run --host=0.0.0.0 --port=5020 
 
-## Brief description about the functionalities
+## Brief description about the scope
 
-The Prepay Correspondance Checker application can check correpsondance between a claim and multiple medical records uploaded on the provider portal in the Prepay module.
-
-The Plagiarism Calculation Python application can run plagiarism report by receiving mulitple files at the same time including images, and text documents. In future, we plan to support textual content stored in the tabular form as well. For now, the following formats are supported for both applications:
+All three Alivia OCR applications can run plagiarism report by receiving mulitple files at the same time including images, and text documents. In future, we plan to support tabular data as well for the analysis. For now, the following formats are supported for all three applications:
 - For documents, it can extract text from the following formats:
-['.txt', '.docx']
+['.txt', '.docx', '.pdf]
 - For images, it can extract text from the following formats:
-['.jpeg', '.jpg', '.png', 'pdf']
+['.jpeg', '.jpg', '.png']
+
+We expect the application to show high performance for printed text but it can perform "okayish" on handwritten documents too. To achieve high performance in handwritten content, we need to follow the formal process of training the model on the dataset of handwritten medical records.
