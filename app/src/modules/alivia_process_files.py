@@ -8,7 +8,10 @@ import os
 from PIL import Image,ImageFilter
 import logging
 import pythoncom
-from docx import Document
+from docx import Document, text
+import fitz  # PyMuPDF
+import subprocess
+
 
 ############################################# Process attachments #############################################
 
@@ -26,7 +29,7 @@ class ProcessAttachments:
 
         if Path(path).suffix in ['.csv', '.xls', '.xlsb', '.xlsm', '.xlsx', '.xml', '.ods']:
             file_type = "Tabular Data"
-        elif Path(path).suffix in ['.jpeg', '.jpg', '.png', '.pdf', '.tiff', '.tif']:
+        elif Path(path).suffix in ['.jpeg', '.jpg', '.png', '.pdf']:
             file_type = "Image Data"
         elif Path(path).suffix in ['.txt', '.docx']:
             file_type = "Text Data"
@@ -62,48 +65,71 @@ class ProcessAttachments:
         
         return (list_table_types, list_image_types, list_text_types), (index_table_types, index_image_types, index_text_types)
     
-
-    def only_docx_to_pdf(self, input_file, output_file):
     
-        doc = Document(input_file)
+    def unoconv_pdf(self, input_file, output_file):
+        try:
+            subprocess.run(['unoconv', '--output', output_file, '--format', 'pdf', input_file], check=True)
+            print(f"Conversion successful: {output_file}")
+        except subprocess.CalledProcessError as e:
+            print(f"Conversion failed: {e}")
+        
+
+    def handle_encoding_error(self, text):
+        
+        encodings_to_try = ['latin-1', 'utf-8', 'utf-16', 'utf-32', 'windows-1252'] # their sequence is also important. we might not need all.
+
+        # Handling encoding issues by attempting different encodings
+        for encoding in encodings_to_try:
+            try:
+                text = text.encode(encoding, 'ignore').decode(encoding)
+                #break
+            except UnicodeEncodeError:
+                pass
+    
+        return text
+
+
+    def fitz_docx_pdf(self, input_file, output_file):
+
+        pdf_document = fitz.open()
+
+        # Open the DOCX file
+        with fitz.open(input_file) as doc:
+            pdf_bytes = doc.convert_to_pdf()
+
+            # Add the converted PDF bytes to the PDF document
+            pdf_document.insert_pdf(fitz.open(stream=pdf_bytes))
+
+        # Save the PDF document
+        pdf_document.save(output_file)
+        pdf_document.close()
+    
+
+
+    def docx_to_pdf(self, input_file, output_file):
     
         # Initialize the PDF object
         pdf = FPDF()
-        pdf.set_auto_page_break(auto=True, margin=15)
         pdf.add_page()
+        pdf.set_line_width(0.5)
+        #pdf.set_auto_page_break(auto=True, margin=20)
+        pdf.set_compression(False)
+        pdf.set_font("Arial", size=10)
+
     
-        # Convert each paragraph in DOCX to a PDF page
-        #for para in doc.paragraphs:
-        # encoded_text = para.text.encode('latin-1', 'replace').decode('latin-1')
-        # pdf.set_font("Arial", size=11)
-        # pdf.multi_cell(0, 10, encoded_text)
-        # pdf.ln()
-
-        encodings_to_try = ['latin-1', 'utf-8', 'utf-16', 'utf-32', 'windows-1252'] # their sequence is alsoe important. we might not need all.
-
+        doc = Document(input_file)
+        
         for para in doc.paragraphs:
-            text = para.text
-        
-            # Handling encoding issues by attempting different encodings
-            for encoding in encodings_to_try:
-                try:
-                    text = text.encode(encoding, 'ignore').decode(encoding)
-                    break
-                except UnicodeEncodeError:
-                    pass
-        
-            # Handling special characters by replacing them
-            text = text.replace('\u2022', '-')  # Example: Replace bullet points with hyphens
-        
-            # Adding text to PDF
-            pdf.set_font("Arial", size=10)
-            pdf.multi_cell(0, 10, text)
-            pdf.ln()
 
-    
+            text = para.text
+            text = self.handle_encoding_error(text)
+            text = text.replace('\u2022', '-') # Replace bullet points with hyphens
+            pdf.multi_cell(w=0, h=5, txt=text) # write text to PDF
+            #pdf.ln() # next line
+        
         # Output the PDF to the specified file
         pdf.output(output_file)
-
+        
 
 
     def txt_docs_to_pdf(self, input_file, index):
@@ -121,35 +147,42 @@ class ProcessAttachments:
             pdf = FPDF()
             pdf.add_page()
 
-            # Set font for the PDF
             pdf.set_font("Arial", size=11)
-            # Read the text content from the input filec1
-            with open(input_file, 'r') as file:
+            
+            with open(input_file, 'r') as file: # Read the text content from the input file
                 lines = file.readlines()
-           
-            max_length = 90
+ 
+            max_length = 100
             for line in lines:
                 line_list = []
+                                
+                line = self.handle_encoding_error(line)
+    
                 while len(line) >= max_length:
                     line_first, line = line[:max_length], line[max_length:]
                     line_list.append(line_first)
+                
                 line_list.append(line)
 
                 for i in range(len(line_list)):
                     line_once = line_list[i]
-                    pdf.cell(200, 10, txt=line_once, ln=2)
+                    #pdf.cell(200, 10, txt=line_once, ln=1)
+                    pdf.multi_cell(w=0, h=5, txt=line_once)
 
             # Output the PDF to the specified path and file
             pdf.output(output_file)
         
 
         elif Path(input_file).suffix == '.docx':
+            
             #pythoncom.CoInitialize()
             #convert(input_file, output_file)
-            self.only_docx_to_pdf(input_file, output_file)
+            self.docx_to_pdf(input_file, output_file)
+            #self.unoconv_pdf(input_file, output_file)
+            #self.fitz_docx_pdf(input_file, output_file)
             
         else:
-            pass #handle this very nicely!
+            pass # handle this very nicely instead of just passing!
 
         return output_file
     
@@ -196,24 +229,22 @@ class ProcessAttachments:
         if not os.path.exists(temp_dir):
             os.makedirs(temp_dir)
         
-        #output_pdf_path = temp_dir + f"output_{index}.pdf"
-        #splitter = self.split_directory_filename()
-        #directory, filename = splitter(filepath)
         directory, filename = self.split_directory_filename(filepath)
         filename = filename + '_highlight.pdf'
 
         output_pdf_path = directory + '\\' + filename
 
         pythoncom.CoInitialize()
+        
         pdf = FPDF()
         
         for j in range(len(list_numpy_images)):
-            #print(j)
+            
             temp_path, img_size = self.save_temp_images(list_numpy_images[j], j)
             #w, h, c = img_size
             pdf.add_page()
             #pdf.image(temp_path, 10, 10, 180)
-            pdf.image(temp_path, 5, 5, 210)
+            pdf.image(temp_path, 2, 2, 200)
 
         pdf.output(output_pdf_path)
 

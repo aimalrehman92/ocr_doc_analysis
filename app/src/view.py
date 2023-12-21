@@ -1,18 +1,17 @@
 
 from fastapi import APIRouter
-
+#import asyncio
 from app.src.f1_plagiarism_calc import main_percentage
 from app.src.f1_plagiarism_calc import main_text_return
 from app.src.f2_correspondence_checker import main_correspondence
 from app.src.f3_AI_polish_calc import main_AI_polish_calculator
-
+#from app.src.utilities import delete_expired_files
 
 
 router = APIRouter(
     tags=["Alivia-AI-DS-Service"],
-    responses={404: {"description": "Not found"}},
+    responses={404: {"Get Request": "Welcome to Alivia-OCR based intelligent document procrssing units"}},
 )
-
 
 @router.post("/plagiarism_calculation")
 async def plagiarism_calculator_1(data: dict):

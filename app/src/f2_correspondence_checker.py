@@ -12,7 +12,6 @@ from datetime import datetime
 
 def main_correspondence(req_json):
 
-
     handle_error = HandleErrorLogs()
         
     try:
@@ -22,7 +21,7 @@ def main_correspondence(req_json):
         list_paths_original = list_paths.copy()
             
         url = req_json["connectionString"]
-            
+
         # Perform string parsing
         url_parts = url.split(";")
         server = url_parts[0].split(":")[0]
@@ -81,7 +80,12 @@ def main_correspondence(req_json):
         plagiarism_calc = PlagiarismCalculation()
         return_image = ReturnImageData()
         proc_attach = ProcessAttachments()
-        extract_from_image = ExtractImageText()
+        
+        settings_ = {'color_to_greyscale':True, 'adjust_dpi':True,
+                         'noise_filters':False, 'binarize_image':False,
+                         'adjust_image_size':False, 'resize_to_A4':True}
+        
+        extract_from_image = ExtractImageText(settings_)
             
         ### Read and collect all the data from the documents stored ###
         list_meta_data, list_image_data, list_text_data = [], [], []

@@ -17,44 +17,52 @@ def main_percentage(req_json):
         
     try:
 
-        attachments_len = len(req_json)
+        attachments_len = len(req_json) # number of attachments
         
         dummy_output = {"primary_output":{"Attach_None":["NA"]}, "secondary_output": {"Attach_None": "NA"}} # Placeholder!
     
         if attachments_len <= 1:
-            output = dummy_output
+            output = dummy_output # dummy output in case no files are attached
 
         else:
+            
             proc_attach = ProcessAttachments()
-            extract_from_image = ExtractImageText()
             extract_from_doc = ExtractDocumentText()
             plag_calc = PlagiarismCalculation()
+
+            settings_ = {'color_to_greyscale':False, 'adjust_dpi':False, 'noise_filters':False, 'binarize_image':False, 'adjust_image_size':False}
+            extract_from_image = ExtractImageText(settings_)
+            
 
             list_paths, list_texts = [], [] 
 
             for ii in range(1, attachments_len+1): 
                 list_paths.append(req_json[str(ii)])
                 
-            list_paths = [path_ for path_ in list_paths if path_ is not None] # None cleaning
+            list_paths = [path_ for path_ in list_paths if path_ is not None] # None cleaning in the list of paths
+
 
             for path in list_paths:
-                
+                        
                 if proc_attach.detect_file_type(path) == "Image Data":
                     text = extract_from_image.extract_text(path)
-                    text = extract_from_image.process_single_string(text)
                     
                 elif proc_attach.detect_file_type(path) == "Text Data":
                     text = extract_from_doc.extract_text(path)
-                    text = extract_from_doc.process_single_string(text)
         
                 else:
-                    pass
+                    pass #ignore
+
+                text = extract_from_doc.process_single_string(text)
                 
                 list_texts.append(text)
             
             indices = list(range(1, len(list_texts)+1))  
+            
             sim_matrix = plag_calc.similarity_score(list_texts, indices)
+            
             output = plag_calc.filter_matrix(sim_matrix)
+            
             output['paths_matrix'] = plag_calc.paths_matrix(list_paths)
 
     except Exception as e:
@@ -69,13 +77,9 @@ def main_text_return(req_json):
     
     try:
 
-        attachments_len = len(req_json)
+        attachments_len = len(req_json) # number of attachments : it should always be 2
         
-        list_paths = []
-
         return_image = ReturnImageData()
-        proc_attach = ProcessAttachments()
-        extract_from_image = ExtractImageText()
             
         image = return_image.null_image((256, 256, 3))
         dummy_output = {"Doc_1": image, "Doc_2": image} # Placeholder!
@@ -84,15 +88,23 @@ def main_text_return(req_json):
             output = dummy_output
 
         else:
+            
+            proc_attach = ProcessAttachments()
 
+            settings_ = {'color_to_greyscale':True, 'adjust_dpi':True,
+                         'noise_filters':False, 'binarize_image':False,
+                         'adjust_image_size':True, 'resize_to_A4':True}
+            
+            extract_from_image = ExtractImageText(settings_)
+        
             list_paths = []
 
             for i in range(1, attachments_len+1):
                 list_paths.append(req_json[str(i)])
             
-            list_paths = [path_ for path_ in list_paths if path_ is not None] # None cleaning
+            list_paths = [path_ for path_ in list_paths if path_ is not None] # None cleaning in the list of paths for the attachments
 
-            list_paths_original = list_paths.copy()
+            list_paths_original = list_paths.copy() # make a copy
                 
             list_meta_data, list_image_data, list_text_data = [], [], []
 
@@ -108,7 +120,6 @@ def main_text_return(req_json):
                 text = extract_from_image.process_single_string(text) # if string cleaning + conversion to list of words
 
                 meta, page_images = extract_from_image.extract_text_with_coordinates(path)
-                #meta = meta[meta['conf'] > 0]
                     
                 list_text_data.append(text)
                 list_meta_data.append(meta) 
@@ -116,16 +127,17 @@ def main_text_return(req_json):
                     
                 
             if not ((attachments_len == len(list_text_data)) and (attachments_len == len(list_meta_data)) and (attachments_len == len(list_image_data))):
-                pass
+                #sanity check
+                output = dummy_output
                 
             else:
 
                 common_words = [i for i in list_text_data[0] if i in list_text_data[1]]        
-                common_words = [word for word in common_words if word]
+                common_words = [word for word in common_words if word] # should be a valid string only
                             
-                for i in range(attachments_len):
-                    
+                for i in range(attachments_len): # for each attachment, loop over and highlight text on all of its pages (if any)
                     list_image_data[i] = return_image.highlight_text_on_image(list_meta_data[i], common_words, list_image_data[i], i)
+                    list_image_data[i] = extract_from_image.postprocess_images(list_image_data[i])
 
                 output_paths = []
                     

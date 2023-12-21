@@ -61,8 +61,14 @@ def main_AI_polish_calculator(req_json):
             tokenizer, model = load_model(model_path)
             
             proc_attach = ProcessAttachments()
-            extract_from_image = ExtractImageText()
             extract_from_doc = ExtractDocumentText()
+
+            settings_ = {'color_to_greyscale':False, 'adjust_dpi':False,
+                         'noise_filters':False, 'binarize_image':False,
+                         'adjust_image_size':False, 'resize_to_A4':False}
+            
+            extract_from_image = ExtractImageText(settings_)
+            
 
             list_paths, list_texts = [], [] 
 
@@ -75,18 +81,16 @@ def main_AI_polish_calculator(req_json):
                     
                 if proc_attach.detect_file_type(path) == "Image Data":
                     text = extract_from_image.extract_text(path)
-                    text = text.splitlines()
-                    #text = extract_from_image.process_single_string(text)
                     
                 elif proc_attach.detect_file_type(path) == "Text Data":
                     text = extract_from_doc.extract_text(path)
-                    text = text.splitlines()
-                    #text = extract_from_doc.process_single_string(text)
         
                 else:
                     pass
                     
-                
+                text = text.splitlines()
+                #text = extract_from_image.process_single_string(text)
+
                 list_texts.append(text) # list of 'str'
 
             output = {}
@@ -114,6 +118,8 @@ def main_AI_polish_calculator(req_json):
                 
                 filename = os.path.basename(path)
                 output[filename] = polish_ratio
+
+            output = {k: v for k, v in sorted(output.items(), key=lambda item: item[1], reverse=True)}
                     
 
     except Exception as e:
