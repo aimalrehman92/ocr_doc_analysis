@@ -1,4 +1,4 @@
-# Optical Character Recognition Alivia - Intelligent Document Processing Applications
+# Optical Character Recognition (OCR) based Alivia-Intelligent Document Processing Applications
 
 This repository contains 3 OCR based services:
 1. OCR based Plagiarism Calculator
