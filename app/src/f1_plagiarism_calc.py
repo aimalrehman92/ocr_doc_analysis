@@ -42,10 +42,14 @@ def main_percentage(req_json):
             list_paths = [path_ for path_ in list_paths if path_ is not None] # None cleaning in the list of paths
 
 
+            filename_list = []
+            
             for path in list_paths:
                         
                 if proc_attach.detect_file_type(path) == "Image Data":
                     text = extract_from_image.extract_text(path)
+                    _, filename = proc_attach.split_directory_filename(path)
+                    filename_list.append(filename)
                     
                 elif proc_attach.detect_file_type(path) == "Text Data":
                     text = extract_from_doc.extract_text(path)
@@ -58,8 +62,8 @@ def main_percentage(req_json):
                 list_texts.append(text)
             
             indices = list(range(1, len(list_texts)+1))  
-            
-            sim_matrix = plag_calc.similarity_score(list_texts, indices)
+                
+            sim_matrix = plag_calc.similarity_score(list_texts, filename_list, indices)
             
             output = plag_calc.filter_matrix(sim_matrix)
             

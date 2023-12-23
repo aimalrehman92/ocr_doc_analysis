@@ -11,14 +11,16 @@ class PlagiarismCalculation:
     def __init__(self):
         pass
 
-    def similarity_score(self, list_strings, index_types):
+    def similarity_score(self, list_strings, filename_list, index_types):
 
-        # list_w: : # ['ocr1', 'text2', 'text1', 'ocr2', 'ocr3', 'ocr4]
-        
         scores = {} 
         count = len(list_strings)
+
+        print(filename_list)
+        
         for i in range(count):
-            key = 'Attach_'+str(index_types[i])
+            #key = 'Attach_'+str(index_types[i])
+            key = filename_list[i]
             scores[key] = [] # placeholder!
 
             for j in range(count):
