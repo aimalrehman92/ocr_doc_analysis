@@ -149,7 +149,7 @@ class ProcessAttachments:
 
             pdf.set_font("Arial", size=11)
             
-            with open(input_file, 'r') as file: # Read the text content from the input file
+            with open(input_file, encoding='utf-8') as file:
                 lines = file.readlines()
  
             max_length = 100

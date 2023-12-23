@@ -236,22 +236,33 @@ class ExtractImageText(ExtractTextAndProcess):
 
         elif self.check_image_type(image) == "Numpy array":
             
+            channel_count = len(image.shape)
+            
             if (adjusted_resolution[0] > image.shape[0]) and (adjusted_resolution[1] > image.shape[1]):
                 
                 new_width = adjusted_resolution[1]
                 new_height = adjusted_resolution[0]
             
-                empty_image = np.ones((new_width, new_height), dtype=np.uint8) * 255  # Create a white image
-                empty_image_copy = np.ones((new_height, new_width), dtype=np.uint8) * 255
-
+                if channel_count != 3:
+                    empty_image = np.ones((new_width, new_height), dtype=np.uint8) * 255  # Create a white image
+                    empty_image_copy = np.ones((new_height, new_width), dtype=np.uint8) * 255
+                   
+                else:
+                    empty_image = np.ones((new_width, new_height, 3), dtype=np.uint8) * 255  # Create a white image
+                    empty_image_copy = np.ones((new_height, new_width, 3), dtype=np.uint8) * 255
+                
                 x_offset = (empty_image.shape[1] - image.shape[1]) // 2
                 y_offset = (empty_image.shape[0] - image.shape[0]) // 2
 
                 x_end = x_offset + image.shape[1]
                 y_end = y_offset + image.shape[0]
 
-                # Paste the small image onto the empty image at the center
-                empty_image[y_offset:y_end, x_offset:x_end] = image
+                if channel_count == 3:
+                    # Paste the small image onto the empty image at the center
+                    empty_image[y_offset:y_end, x_offset:x_end, :] = image
+                else:
+                    empty_image[y_offset:y_end, x_offset:x_end] = image
+                    
 
                 resized_image = empty_image
 
