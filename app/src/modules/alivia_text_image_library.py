@@ -377,7 +377,8 @@ class ExtractDocumentText(ExtractTextAndProcess):
        
         self.string_one_file = '' # placeholder !
         if Path(self.list_paths).suffix == '.txt':
-            with open(self.list_paths) as f:
+            #with open(self.list_paths) as f:
+            with open(self.list_paths, encoding='utf-8') as f:
                 contents = f.read()
                 self.string_one_file = self.string_one_file + contents
         
