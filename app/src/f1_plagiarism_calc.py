@@ -48,8 +48,8 @@ def main_percentage(req_json):
                         
                 if proc_attach.detect_file_type(path) == "Image Data":
                     text = extract_from_image.extract_text(path)
-                    _, filename = proc_attach.split_directory_filename(path)
-                    filename_list.append(filename)
+                    #_, filename = proc_attach.split_directory_filename(path)
+                    #filename_list.append(filename)
                     
                 elif proc_attach.detect_file_type(path) == "Text Data":
                     text = extract_from_doc.extract_text(path)
@@ -60,6 +60,9 @@ def main_percentage(req_json):
                 text = extract_from_doc.process_single_string(text)
                 
                 list_texts.append(text)
+
+                _, filename = proc_attach.split_directory_filename(path)
+                filename_list.append(filename)
             
             indices = list(range(1, len(list_texts)+1))  
                 
