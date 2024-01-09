@@ -32,7 +32,7 @@ It is recommended to install it in the following path:
 (It will ask for path during installation.Don't worry!)
 &nbsp;
 - Assuming that the environment is still activate, now run the following command:
-    - #uvicorn app.main:app --host 0.0.0.0 --port 5020 --reload
+    - uvicorn app.main:app --host 0.0.0.0 --port 5020 --reload
 &nbsp;
 - Remember that plagiarism report can be viewed at http://127.0.0.1:5020/plagiarism_calculation/
 - Remember that correspondence check can be viewed at http://127.0.0.1:5020//prepay_correspondance_check/
