@@ -32,7 +32,7 @@ pd.options.mode.chained_assignment = None  # or 'warn'
 class ExtractTextAndProcess:
 
     def __init__(self):
-        pass
+        pass # for future!
     
     @abstractmethod
     def extract_text(self, list_paths):
@@ -40,12 +40,16 @@ class ExtractTextAndProcess:
 
 
     def unicode_to_ascii(self, s):
-        
+        #input: string
+        #output: string
         self.s = s
         return ''.join(c for c in unicodedata.normalize('NFD', self.s) if unicodedata.category(c) != 'Mn')
 
 
+    # this function cleans text
     def text_cleaning(self, w):
+        # input: string
+        # output: string
         
         self.w = w
         self.w = self.unicode_to_ascii(self.w)
@@ -63,7 +67,10 @@ class ExtractTextAndProcess:
         return " ".join(self.words)
 
 
+    # this function processes list of strings as oppose to the function below
     def process_all_text(self, list_w):
+        # input: list of strings
+        # output: list of strings (cleaned)
         
         self.list_w = list_w
         self.clean_strings = []
@@ -73,19 +80,24 @@ class ExtractTextAndProcess:
             self.clean_strings.append(self.clean_text)
         return self.clean_strings
     
-
+    # this function processes a single string
     def process_single_string(self, single_string):
-        
-        #clean_text = self.text_cleaning(single_string)
+        # input: string
+        # output: string
+        #clean_text = self.text_cleaning(single_string) # clean it
         clean_text = single_string.split()
         return clean_text
 
-
+    # this function removes any special character present in the document
     def remove_special_characters_word(self, words_list):
+
+        #input: list of strings
+        #output: list of strings
 
         if len(words_list) > 0:
             words_list = [word for word in words_list if not re.match(r'^\W+$', word)]
         return words_list
+
 
 
 class ExtractImageText(ExtractTextAndProcess):
@@ -104,7 +116,10 @@ class ExtractImageText(ExtractTextAndProcess):
         self.poppler_path = os.getcwd() + r'\app\src\modules\poppler-23.08.0\Library\bin'
 
     
+    # this function adjust image quality
     def adjust_image_dpi(self, image, scale_h=2, scale_w=2):
+        # input: image (can be numpy array or Pillow image)
+        # output: image (scaled image)
         
         if self.check_image_type(image) == "Pillow image":
             
@@ -125,24 +140,33 @@ class ExtractImageText(ExtractTextAndProcess):
         return image
     
 
+    # this function resizes an image to A4-paper dimension
     def resize_to_A4(self, image):
+        # input: Numpy array or Pillow image
+        # output: Numpy array or Pillow image
 
         if self.check_image_type(image) == "Numpy array":
             image = cv2.resize(image, (2480, 3508)) # A4 resolution
         
         if self.check_image_type(image) == "Pillow image":
-            pass
+            pass # this needs to be done yet!
 
         return image
 
-
+    # this function removes any noise in the filter
     def noise_filters(self, image):
-        
+        #input: Pillow image
+        #ouput: Pillow image
+
         image = image.filter(ImageFilter.MinFilter(3)) # Min pix : Be careful in using this !
         return image
     
  
+    # this function binarizes the images
     def binarize_image(self, image, threshold=120):
+
+        # input: Numpy array or Pillow Image
+        # output: Numpy array or Pillow Image
 
         if self.check_image_type(image) == "Pillow image":
             image = image.point(lambda p: 0 if p < threshold else 255)
@@ -152,8 +176,11 @@ class ExtractImageText(ExtractTextAndProcess):
 
         return image
 
-
+    # to check the type of image
     def check_image_type(self, image):
+
+        # input: Numpy array or Pillow Image
+        # output: string value
 
         if isinstance(image, Image.Image):
             image_type = "Pillow image"
@@ -165,7 +192,10 @@ class ExtractImageText(ExtractTextAndProcess):
         return image_type
     
 
+    # this function gereyscale any image
     def color_to_greyscale(self, image):
+        # input: Numpy array or Pillow image
+        # output: Numpy array or Pillow image
 
         if self.check_image_type(image) == "Numpy array":
             if (len(image.shape) >= 3) and (image.shape[2] == 3):
@@ -178,7 +208,7 @@ class ExtractImageText(ExtractTextAndProcess):
 
         return image
     
-    
+    # this function is unused
     def equalize_text_hist(self, image):
         
         if self.check_image_type(image) == "Numpy array":
@@ -189,7 +219,7 @@ class ExtractImageText(ExtractTextAndProcess):
 
         return image
     
-            
+    # this fucntion is also unused
     def is_black_background_histogram(self, image_path):
         
         image = cv2.imread(image_path)
@@ -208,10 +238,12 @@ class ExtractImageText(ExtractTextAndProcess):
             return False  # Probably not black background with white text
 
 
+    # This function will increase the dimensions of image (if low) by appending blank spaces around it
     def adjust_image_size(self, image, adjusted_resolution):
-
-        # This function will increase the dimensions of image (if low) by appending blank spaces around it
-
+        # input: pillow image or Numpy array
+            # and desired resolution (width, height)
+        # output: (resized) image, (empty) image of same dimension (for any further usage)
+    
         if self.check_image_type(image) == "Pillow image":
             
             if (adjusted_resolution[0] > image.width) and (adjusted_resolution[1] > image.height):
@@ -273,7 +305,11 @@ class ExtractImageText(ExtractTextAndProcess):
         return resized_image, empty_image_copy
 
 
+    # pipeline to preprocess image
     def preprocess_image(self, image, adjusted_resolution=(1920, 1080)):
+
+        # input: Pillow image or Numpy array
+        # output: Pillow image or Numpy array
         
         if self.color_to_greyscale_flag:
             image = self.color_to_greyscale(image)
@@ -293,7 +329,10 @@ class ExtractImageText(ExtractTextAndProcess):
         return image
 
 
+    # postprocess images in list
     def postprocess_images(self, images_list, adjusted_resolution=(1920, 1080)):
+        # input: list of images (Pillow or Numpy arrays)
+        # output: list of images (Pillow or Numpy arrays)
 
         for j in range(len(images_list)):
 
@@ -310,22 +349,24 @@ class ExtractImageText(ExtractTextAndProcess):
         return images_list
         
 
-    def extract_text(self, file_path):   
-        
-        # This function will return the entire text from one document (PDF, jpg or another image) in the form of a string
+    # function to only extract text from an attachment. The entire text is extracted as a single string.
+    def extract_text(self, file_path):
+
+        #input: path string
+        #output: string value
 
         pytesseract.pytesseract.tesseract_cmd = self.path_tesseract
 
-        texts = ''
+        texts = '' # start with empty text
 
-        if Path(file_path).suffix == '.pdf':
+        if Path(file_path).suffix == '.pdf': # if its a pdf
             doc = convert_from_path(file_path, poppler_path=self.poppler_path)
-            for page_number, page_data in enumerate(doc):
-                page_data = self.preprocess_image(page_data) # we will put self.flags inside here
-                texts += pytesseract.image_to_string(page_data)
-                #texts = self.postprocess_text(texts) # we will put self.flags inside here
+            for page_number, page_data in enumerate(doc): # iterate over pages
+                page_data = self.preprocess_image(page_data) # we will put self.flags inside here later in future
+                texts += pytesseract.image_to_string(page_data) # append string values
+                #texts = self.postprocess_text(texts) # we will put self.flags inside here later in future as well
 
-        else:
+        else: # if its not a .pdf then its an image
             image = Image.open(file_path) # Pillow image
             image = self.preprocess_image(image) # we will put self.flags inside here
             texts = pytesseract.image_to_string(image)
@@ -333,8 +374,10 @@ class ExtractImageText(ExtractTextAndProcess):
         
         return texts
     
-    
-    def extract_text_with_coordinates(self, path):   
+    # function to extract text alongwith the coordinates of the text content
+    def extract_text_with_coordinates(self, path):
+        # input: string path of the target attachment (single)
+        # output: list of dataframes containing metadata, list of images
         
         pytesseract.pytesseract.tesseract_cmd = self.path_tesseract 
         
@@ -371,7 +414,11 @@ class ExtractDocumentText(ExtractTextAndProcess):
     def __init__(self):
         pass
 
-    def extract_text(self, list_paths):   
+
+    # function to extract text
+    def extract_text(self, list_paths):
+        # input: list of string paths
+        # output: list of strings (extracted texts)
         
         self.list_paths = list_paths
        
@@ -395,10 +442,10 @@ class ExtractDocumentText(ExtractTextAndProcess):
 class ExtractTableText(ExtractTextAndProcess):
 
     def __init__(self):
-        pass
+        pass # for future
 
     def extract_text(self, list_paths):
-        pass
+        pass # for future
 
 
 
@@ -412,13 +459,16 @@ class ReturnImageData:
         image = np.zeros(dimensions)
         return image
 
-
+    # function to read any image in opencv
     def cv_image(self, path):
         image = cv2.imread(path)
         return image
     
-
+    # function to split strings on white spaces and create list
     def split_and_repopulate_string_list(self, string_list):
+        #input: list of string values
+        #output: list of string values
+
         new_list = []
         for s in string_list:
             if " " in s: #or not s.isalpha():
@@ -429,8 +479,13 @@ class ReturnImageData:
                 new_list.append(s)
         return new_list
 
-
+    # function to highlight text in images
     def highlight_text_on_image(self, ocr_meta_data, common_words, ocr_images, img_num):
+        #input: list of dataframes containing metadata
+            # list of strings (words)
+            # list of numpy arrays (images)
+        
+        #output: list of Numpy arrays (images)
         
         no_of_pages = len(ocr_images)
         common_words =  self.split_and_repopulate_string_list(common_words)
@@ -445,8 +500,8 @@ class ReturnImageData:
             if len(ocr_image.shape) < 3:
                 ocr_image = np.repeat(ocr_image[:, :, np.newaxis], 3, axis=2) # ensure the number of channels is 3 even if its greyscale
 
-            # modfiy the datfarame containing meta data to group neighboring words that are plagiarised
-                
+            # modfiy the datafaame containing meta data to group neighboring words that are plagiarised
+            # the following lines identify the adjacent words in a single line
             meta_data = ocr_meta_data[ocr_meta_data['page_num'] == ii+1].copy()
             meta_data = meta_data[meta_data['text'].isin(common_words)]
             meta_data['right'] = meta_data['left'] + meta_data['width']
@@ -510,7 +565,10 @@ class ReturnImageData:
         return ocr_images
     
 
+    # function to store list of strings in a txt file
     def return_text_from_doc(self, common_words, i):
+        #input: list of strings
+        #output: path string
         
         file_path = f"plagiarised_doc_{i}.txt"
 
@@ -524,7 +582,14 @@ class ReturnImageData:
         return file_path
     
 
+    # function to create outline inside PDF file for specific values found in that PDF
     def create_outline(self, pdf_file, document_text, document_meta_data, text_to_mark, keys_found, output_pdf_file):
+        # input: string path to the PDF file
+            # string (document text)
+            # metadata of the extracted text
+            # list of strings to mark
+            # list of keys founds against those values
+            # string path of new PDF file
         
         pdf = PyPDF2.PdfReader(open(pdf_file, "rb"))
         pdf_writer = PyPDF2.PdfWriter()

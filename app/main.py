@@ -1,4 +1,10 @@
 
+
+# This is the main file for services built upon OCR technology being used in Alivia Analytics.
+# We create FASTAPI based api here and include the API routes from the "View" script inside the "src" folder.
+# You can choose to run it on any port by discussing with DevOps.
+
+
 import uvicorn
 from fastapi import FastAPI
 from app.src import view as ocr_apps

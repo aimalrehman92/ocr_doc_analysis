@@ -1,5 +1,5 @@
 
-# This library contains several file handling functionalities:
+# This library contains several file handling functionalities.
 
 from pathlib import Path
 from fpdf import FPDF
@@ -18,16 +18,18 @@ import subprocess
 class ProcessAttachments:
 
     def __init__(self):
-        pass
+        pass # in case, we want to make a whole block of it in the future
 
-
+    
     def detect_file_type(self, file_path):
+        # input: path string
+        # output: string displaying file type
 
         # Detects if a file type is Image or Text or a Table
         file_type = None
         path = file_path
 
-        if Path(path).suffix in ['.csv', '.xls', '.xlsb', '.xlsm', '.xlsx', '.xml', '.ods']:
+        if Path(path).suffix in ['.csv', '.xls', '.xlsb', '.xlsm', '.xlsx', '.xml', '.ods']: # for future
             file_type = "Tabular Data"
         elif Path(path).suffix in ['.jpeg', '.jpg', '.png', '.pdf']:
             file_type = "Image Data"
@@ -40,6 +42,8 @@ class ProcessAttachments:
     
 
     def group_similar_file_types(self, list_paths):
+        # input: list of path string
+        # output: two tuples, one containing lists grouped by types, and the second containing original index of each group
         
         # Groups file with similar formats together and returns
 
@@ -67,6 +71,7 @@ class ProcessAttachments:
     
     
     def unoconv_pdf(self, input_file, output_file):
+        # input: path string of a single docx file
         try:
             subprocess.run(['unoconv', '--output', output_file, '--format', 'pdf', input_file], check=True)
             print(f"Conversion successful: {output_file}")
@@ -75,7 +80,9 @@ class ProcessAttachments:
         
 
     def handle_encoding_error(self, text):
-        
+        # input: string type data, text
+        # output: string
+
         encodings_to_try = ['latin-1', 'utf-8', 'utf-16', 'utf-32', 'windows-1252'] # their sequence is also important. we might not need all.
 
         # Handling encoding issues by attempting different encodings
@@ -90,7 +97,8 @@ class ProcessAttachments:
 
 
     def fitz_docx_pdf(self, input_file, output_file):
-
+        # input: path string of a docx file
+    
         pdf_document = fitz.open()
 
         # Open the DOCX file
@@ -107,7 +115,8 @@ class ProcessAttachments:
 
 
     def docx_to_pdf(self, input_file, output_file):
-    
+        # input: path string of a docx file
+       
         # Initialize the PDF object
         pdf = FPDF()
         pdf.add_page()
@@ -116,7 +125,6 @@ class ProcessAttachments:
         pdf.set_compression(False)
         pdf.set_font("Arial", size=10)
 
-    
         doc = Document(input_file)
         
         for para in doc.paragraphs:
@@ -131,10 +139,11 @@ class ProcessAttachments:
         pdf.output(output_file)
         
 
-
+    # this function converts a single text file or a single docx file to a pdf file
     def txt_docs_to_pdf(self, input_file, index):
+        # input: path string to .txt or .docx files
+        # path string to corresponding .pdf file
 
-        # Converts a text file or a word document file to PDF to local memory
          
         temp_dir = os.getcwd() + "\\app\\temp_folder\\"
         if not os.path.exists(temp_dir):
@@ -174,11 +183,16 @@ class ProcessAttachments:
         
 
         elif Path(input_file).suffix == '.docx':
-            
+            # There are more than one ways to do it, we have separate functions for all of these.
+            # De-comment the one that is most desirable one.
+
             #pythoncom.CoInitialize()
             #convert(input_file, output_file)
+            
             self.docx_to_pdf(input_file, output_file)
+
             #self.unoconv_pdf(input_file, output_file)
+
             #self.fitz_docx_pdf(input_file, output_file)
             
         else:
@@ -187,9 +201,10 @@ class ProcessAttachments:
         return output_file
     
 
+    # This function saves files particularly to the temp folder of this codebase. These files are subject to deletion to save memory.
     def save_temp_images(self, image_numpy, index):
-        
-        # This function will save image in the local memory for temporary use
+        # input: numpy array (image data)
+        # output: path where image is stored and dimensions of the image
         
         temp_dir = os.getcwd() + "\\app\\temp_folder\\"
 
@@ -208,22 +223,17 @@ class ProcessAttachments:
 
         upscaled_image.save(temp_path)
 
-        #dpi = image.info.get("dpi")
-        #print("DOTS PER IMAGE: ", dpi)
-        #upscaled_image = upscaled_image.filter(ImageFilter.SHARPEN)
         upscaled_image = upscaled_image.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
-        
-        #image_size = image_numpy.shape
+                
         image_size = new_width, new_height
-
-        #print("IMAGE SIZE and TYPE", image_size, type(image))
         
         return temp_path, image_size
     
 
+    # This will convert an image or a group of images per attachment to a single PDF in local and return path
     def images_to_pdf(self, list_numpy_images, index, filepath):
-
-        # This will convert an image or a group of images per attachment to a single PDF in local and return path
+        # input: list of numpy arrays (images)
+        # ouput: list of path strings for the PDF created in this function
         
         temp_dir = os.getcwd() + "\\app\\temp_folder\\"
         if not os.path.exists(temp_dir):
@@ -235,39 +245,33 @@ class ProcessAttachments:
         output_pdf_path = directory + '\\' + filename
 
         pythoncom.CoInitialize()
-        
         pdf = FPDF()
         
         for j in range(len(list_numpy_images)):
             
             temp_path, img_size = self.save_temp_images(list_numpy_images[j], j)
-            #w, h, c = img_size
             pdf.add_page()
-            #pdf.image(temp_path, 10, 10, 180)
             pdf.image(temp_path, 2, 2, 200)
 
         pdf.output(output_pdf_path)
 
         del(pdf)
 
-        # To be used by the service outside
-        #temp_dir = os.getcwd() + "\\temp_folder\\"
-        #output_pdf_path = temp_dir + f"output_{index}.pdf"
-
         return output_pdf_path
     
-    
+    # This function splits a path string into directory where file is stored, and filename
     def split_directory_filename(self, my_string):
+        # input: path string
+        # output: tuple : (directory, filename)
         
         last_index = my_string.rfind('\\')
 
         if last_index != -1:
-            # Extract the substring before the last comma
             directory_info = my_string[:last_index]
             file_name = my_string[last_index + 1:]
             
         else:
-            pass # case handle this issue
+            pass # case handle this issue later!
     
         return directory_info, file_name
             
@@ -275,9 +279,11 @@ class ProcessAttachments:
 class HandleErrorLogs:
 
     def __init__(self):
-        pass
+        pass # for future
 
+    # function to log errors into a text file
     def log_error(self, log_filename, message):
+        #input: path string for logfile and string containing error message
 
         temp_dir = os.getcwd() + "\\app\\logs\\"
 

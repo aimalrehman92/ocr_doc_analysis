@@ -9,30 +9,35 @@ import textdistance
 class PlagiarismCalculation:
     
     def __init__(self):
-        pass
+        pass # left for future!
 
+    # function to capture similarity score among the bunch of documents
     def similarity_score(self, list_strings, filename_list, index_types):
+        # input: list of string values (texts extracted from documents)
+            # list of string values (correpsonding filenames in the exact same order)
+            # list of index types which is unused 
+        #output : dictionary with keys: filenames, values: list of numeric values showing percentage with all files including itself
 
         scores = {} 
         count = len(list_strings)
 
-        print(filename_list)
-        
         for i in range(count):
             #key = 'Attach_'+str(index_types[i])
-            key = filename_list[i]
+            key = filename_list[i] # make key
             scores[key] = [] # placeholder!
 
             for j in range(count):
-                cosine_coef = textdistance.cosine(list_strings[i], list_strings[j])
+                cosine_coef = textdistance.cosine(list_strings[i], list_strings[j]) # compute cosine distance as similarity measure
                 perc_dist = round(cosine_coef*100.0, 2)
                 #perc_dist = round((math.pi - math.acos(cosine_coef)) * 100 / math.pi, 2)
                 scores[key].append(perc_dist)
     
         return scores
     
-
+    # function to store paths information in a matrxi form
     def paths_matrix(self, list_paths):
+        # input: list of string values as path of files
+        # output : dictionary with keys: filenames, values: list of path strings rotated one by one
 
         paths_matrix = {}
 
@@ -46,9 +51,15 @@ class PlagiarismCalculation:
 
         return paths_matrix
 
-    
+    # Another function to capture similarity score among the bunch of documents (UNUSED)
     def similarity_score_all_types(self, ocr_texts, doc_texts, table_texts, index_types):
-    
+        # input: list of texts extracted through OCR pipeline
+            # list of texts extracted from docs or text files
+            # list of texts extracted from tavles
+            # indices of those individual types
+        # output : dictionary with keys: Attachment_no, values: list of numeric values showing percentage with all files including itself
+        
+        
         # ocr_texts : list of texts coming from OCR block
         # doc_texts : list of texts coming from documents / text files
         # table_texts : list of texts coming from tables / DBs
@@ -74,8 +85,10 @@ class PlagiarismCalculation:
 
         return score_matrix
     
-
+    # function to filter top similarity scores
     def filter_top_sim_score(self, score_matrix):
+        # input: dictionary with keys: filenames, values: list of numeric percentager values
+        # output: dictionary containing primary output and secondary output.
 
         doc_names = list(score_matrix.keys()) # [Attach_1, Attach_2, Attach_3, Attach_4, Attach_5, Attach_6]
         primary_output = []
@@ -92,8 +105,10 @@ class PlagiarismCalculation:
 
         return final_output
 
-
+    # function to filter top similarity scores
     def filter_matrix(self, score_matrix):
+        # input: dictionary with keys: filenames, values: list of numeric percentager values
+        # output: dictionary containing primary output and secondary output.
         
         df = pd.DataFrame(columns=list(score_matrix.keys()))
         for key in score_matrix:
@@ -116,8 +131,12 @@ class PlagiarismCalculation:
 
         return final_output
 
-        
+    # function to check if certain strings or substrings (values for example) exist in a text     
     def uni_directional_plagiarism(self, set_values, set_mechanism, text_bucket):
+        # input: list of string items to look for in a text
+        # set mechanism: list of search mechanism for each item in the above list
+        # list of words as pool/bucket to look for values in. This is the text extracted usually for a single document and in which you want to search the desired values.
+        # output: assign the score_list for the document
 
         score_per_doc = []
         
@@ -162,6 +181,7 @@ class PlagiarismCalculation:
         return score_per_doc
             
     
+    # This in unused. This should be retired.
     def uni_directional_plagiarism_old(self, set_values, text_bucket):
 
         score_per_doc = []
