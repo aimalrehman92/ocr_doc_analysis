@@ -6,8 +6,8 @@ from app.src.f1_plagiarism_calc import main_text_return
 #from app.src.utilities import delete_expired_files
 
 router = APIRouter(
-    tags=["Alivia-AI-DS-Service"],
-    responses={404: {"Get Request": "Welcome to Alivia-OCR based intelligent document procrssing units"}},
+    tags=["Plagiarism Calculator"],
+    responses={404: {"Get Request": "Welcome to OCR based intelligent document procrssing units"}},
 )
 
 @router.post("/plagiarism_calculation")

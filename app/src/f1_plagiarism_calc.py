@@ -7,9 +7,9 @@
 # highlighted over a given pair of documents.
 #####################################################################################################################
 
-from app.src.modules.alivia_text_image_library import ExtractImageText, ExtractDocumentText, ReturnImageData
-from app.src.modules.alivia_process_files import ProcessAttachments, HandleErrorLogs
-from app.src.modules.alivia_stats_library import PlagiarismCalculation
+from app.src.modules.text_image_library import ExtractImageText, ExtractDocumentText, ReturnImageData
+from app.src.modules.process_files import ProcessAttachments, HandleErrorLogs
+from app.src.modules.stats_library import PlagiarismCalculation
 
 # function to return the similarity percentage matrix
 def main_percentage(req_json):
