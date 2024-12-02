@@ -1,6 +1,6 @@
 
 #####################################################################################################################
-# This flask application is for plagiarusm calculation among a chunk of medical records.
+# This flask application is for plagiarism calculation among a chunk of medical records.
 # This application can process images, PDF and text files.
 # For similarity measure, we are relying on cosine similarity coefficient and interpret it as percentage similarity.
 # We have two functions: one to return a similarity coefficient matrix and the other to return the plagiarised text
@@ -34,7 +34,7 @@ def main_percentage(req_json):
 
             settings_ = {'color_to_greyscale':False, 'adjust_dpi':False, 'noise_filters':False, 'binarize_image':False, 'adjust_image_size':False}
             extract_from_image = ExtractImageText(settings_) # specific settings of objects : make different objects having different settings inside
-            
+
 
             list_paths, list_texts = [], [] 
 
@@ -42,7 +42,6 @@ def main_percentage(req_json):
                 list_paths.append(req_json[str(ii)])
                 
             list_paths = [path_ for path_ in list_paths if path_ is not None] # None-cleaning in the list of paths
-
 
             filename_list = []
             
@@ -63,6 +62,7 @@ def main_percentage(req_json):
 
                 _, filename = proc_attach.split_directory_filename(path) # full path -----split----> path minus filename , filename
                 filename_list.append(filename) # enlist filenames
+            
             
             indices = list(range(1, len(list_texts)+1)) 
                 
