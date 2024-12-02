@@ -180,33 +180,3 @@ class PlagiarismCalculation:
 
         return score_per_doc
             
-    
-    # This in unused. This should be retired.
-    def uni_directional_plagiarism_old(self, set_values, text_bucket):
-
-        score_per_doc = []
-
-        member_name, dos, proc_code, proc_des = set_values[0], set_values[1], set_values[2], set_values[3]
-
-        if member_name in text_bucket:
-            score_per_doc.append(1)
-        else:
-            score_per_doc.append(0)
-        
-        if dos in text_bucket:
-            score_per_doc.append(1)
-        else:
-            score_per_doc.append(0)
-        
-        if proc_code in text_bucket:
-            score_per_doc.append(1)
-        else:
-            score_per_doc.append(0)
-        
-        if proc_des in text_bucket:
-            score_per_doc.append(1)
-        else:
-            score_per_doc.append(0)
-
-        return score_per_doc
-    

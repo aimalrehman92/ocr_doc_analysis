@@ -219,7 +219,7 @@ class ExtractImageText(ExtractTextAndProcess):
 
         return image
     
-    # this fucntion is also unused
+    # this function is also unused
     def is_black_background_histogram(self, image_path):
         
         image = cv2.imread(image_path)
@@ -438,16 +438,6 @@ class ExtractDocumentText(ExtractTextAndProcess):
  
         return self.texts_list
     
-
-class ExtractTableText(ExtractTextAndProcess):
-
-    def __init__(self):
-        pass # for future
-
-    def extract_text(self, list_paths):
-        pass # for future
-
-
 
 class ReturnImageData:
 

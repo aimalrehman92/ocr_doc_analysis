@@ -3,10 +3,7 @@ from fastapi import APIRouter
 #import asyncio
 from app.src.f1_plagiarism_calc import main_percentage
 from app.src.f1_plagiarism_calc import main_text_return
-from app.src.f2_correspondence_checker import main_correspondence
-from app.src.f3_AI_polish_calc import main_AI_polish_calculator
 #from app.src.utilities import delete_expired_files
-
 
 router = APIRouter(
     tags=["Alivia-AI-DS-Service"],
@@ -22,18 +19,4 @@ async def plagiarism_calculator_1(data: dict):
 async def plagiarism_calculator_2(data: dict):
     result = main_text_return(data)
     return result
-
-
-@router.post("/prepay_correspondance_check")
-async def correspondence_checker_2(data: dict):
-    result = main_correspondence(data)
-    return result
-
-
-@router.post("/ai_polish_calculator")
-async def ai_polish_checker(data: dict):
-    result = main_AI_polish_calculator(data)
-    return result
-
-
 
