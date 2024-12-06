@@ -1,4 +1,5 @@
 
+# This library contains functionalities to process image and text data.
 
 import os
 import numpy as np

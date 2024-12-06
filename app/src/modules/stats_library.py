@@ -1,4 +1,5 @@
 
+# This library contains metric calculation.
 
 import numpy as np
 import pandas as pd
